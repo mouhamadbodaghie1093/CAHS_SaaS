@@ -3,15 +3,20 @@ import os
 
 import dash
 import pandas as pd
+from asgiref.wsgi import WsgiToAsgi  # Ensure this is installed
 from dash import dcc, html, Input, Output, State, dash_table
+from flask import Flask
+
+# Initialize Flask app
+flask_app = Flask(__name__)
 
 # Initialize Dash app
-app = dash.Dash(__name__)
-server = app.server  # Needed for deployment
+app = dash.Dash(__name__, server=flask_app)
+asgi_app = WsgiToAsgi(flask_app)  # Convert Flask to ASGI
 
 # Layout of the web app
 app.layout = html.Div([
-    html.H1("Bacteria Analysis Main Page"),
+    html.H1("FastQ File Processor"),
     dcc.Upload(
         id='upload-data',
         children=html.Button('Upload File'),
@@ -19,7 +24,6 @@ app.layout = html.Div([
     ),
     html.Div(id='output-data-upload'),
 ])
-
 
 # Callback to process uploaded file
 @app.callback(
@@ -52,6 +56,8 @@ def update_output(contents, filename):
     )
 
 
-# Run app
+# Run app (for local testing)
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    import uvicorn
+
+    uvicorn.run(asgi_app, host="0.0.0.0", port=8000)
