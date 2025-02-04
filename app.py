@@ -1,62 +1,82 @@
-import base64
-import os
-
 import dash
-import pandas as pd
-from dash import dcc, html, Input, Output, dash_table
-from dash.dependencies import State
+import dash_bootstrap_components as dbc
+from dash import html
+from dash.dependencies import Input, Output, State
 from flask import Flask
 
-# Initialize Flask app
-flask_app = Flask(__name__)
+# Create a Flask server instance
+server = Flask(__name__)
 
-# Initialize Dash app
-app = dash.Dash(__name__, server=flask_app)
-server = flask_app  # Expose Flask server for deployment
+# Initialize Dash app with Bootstrap theme
+app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-# Layout of the web app
-app.layout = html.Div([
-    html.H1("FastQ File Processor"),
-    dcc.Upload(
-        id="upload-data",
-        children=html.Button("Upload File"),
-        multiple=False,
-    ),
-    html.Div(id="output-data-upload"),
-])
-
-
-# Callback to process uploaded file
-@app.callback(
-    Output("output-data-upload", "children"),
-    Input("upload-data", "contents"),
-    State("upload-data", "filename"),
+# Login Page Layout
+login_layout = html.Div(
+    [
+        dbc.Row(
+            dbc.Col(
+                html.H2("Login Page"),
+                width={"size": 6, "offset": 3},
+            )
+        ),
+        dbc.Row(
+            dbc.Col(
+                dbc.Form(
+                    [
+                        dbc.FormGroup(
+                            [
+                                dbc.Label("Username"),
+                                dbc.Input(id="username", placeholder="Enter Username", type="text"),
+                            ]
+                        ),
+                        dbc.FormGroup(
+                            [
+                                dbc.Label("Password"),
+                                dbc.Input(id="password", placeholder="Enter Password", type="password"),
+                            ]
+                        ),
+                        dbc.Button("Login", id="login-button", color="primary", block=True),
+                    ]
+                ),
+                width={"size": 6, "offset": 3},
+            )
+        ),
+    ]
 )
-def update_output(contents, filename):
-    if contents is None:
-        return "No file uploaded."
 
-    # Decode file
-    content_type, content_string = contents.split(",")
-    decoded = base64.b64decode(content_string)
+# Main Page Layout (after successful login)
+main_layout = html.Div(
+    [
+        html.H1("Welcome to the main page!"),
+        html.Div("This page appears after successful login."),
+        # Your existing Dash components for the main page here
+    ]
+)
 
-    # Save file temporarily
-    temp_filename = f"temp_{filename}"
-    with open(temp_filename, "wb") as f:
-        f.write(decoded)
-
-    # Process file (placeholder for real processing)
-    result = pd.DataFrame({"Filename": [filename], "Status": ["Processed"]})
-
-    # Remove temp file after processing
-    os.remove(temp_filename)
-
-    return dash_table.DataTable(
-        data=result.to_dict("records"),
-        columns=[{"name": i, "id": i} for i in result.columns],
-    )
+# Define the app layout initially as the login page
+app.layout = login_layout
 
 
-# Run app (for local testing, Render uses its own server)
+# Define the login callback to verify username and password
+@app.callback(
+    Output("app-container", "children"),
+    [Input("login-button", "n_clicks")],
+    [State("username", "value"), State("password", "value")]
+)
+def login(n_clicks, username, password):
+    if n_clicks is None:
+        return login_layout
+
+    # Check if the credentials match
+    if username == "cash" and password == "cash":
+        return main_layout  # Redirect to the main page
+    else:
+        return html.Div([
+            html.H3("Invalid credentials, please try again."),
+            login_layout
+        ])  # Keep the login page if invalid credentials
+
+
+# Run the app on the server
 if __name__ == "__main__":
-    flask_app.run(host="0.0.0.0", port=8000)
+    app.run_server(debug=True)
