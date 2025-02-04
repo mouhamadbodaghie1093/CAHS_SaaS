@@ -11,7 +11,7 @@ from flask import Flask
 flask_app = Flask(__name__)
 
 # Initialize Dash app
-app = dash.Dash(__name__, server=flask_app)
+app = dash.Dash(__name__, server=flask_app, suppress_callback_exceptions=True)
 server = flask_app  # Expose Flask server for Gunicorn
 asgi_app = WsgiToAsgi(flask_app)  # Convert Flask to ASGI
 
@@ -37,25 +37,31 @@ def update_output(contents, filename):
     if contents is None:
         return "No file uploaded."
 
-    # Decode file
-    content_type, content_string = contents.split(",")
-    decoded = base64.b64decode(content_string)
+    try:
+        # Decode file
+        content_type, content_string = contents.split(",")
+        decoded = base64.b64decode(content_string)
 
-    # Save file temporarily
-    temp_filename = f"temp_{filename}"
-    with open(temp_filename, "wb") as f:
-        f.write(decoded)
+        # Save file temporarily
+        temp_filename = f"temp_{filename}"
+        with open(temp_filename, "wb") as f:
+            f.write(decoded)
 
-    # Process file (placeholder for real processing)
-    result = pd.DataFrame({"Filename": [filename], "Status": ["Processed"]})
+        # Process file (placeholder for real processing)
+        result = pd.DataFrame({"Filename": [filename], "Status": ["Processed"]})
 
-    # Remove temp file after processing
-    os.remove(temp_filename)
+        # Remove temp file after processing
+        os.remove(temp_filename)
 
-    return dash_table.DataTable(
-        data=result.to_dict("records"),
-        columns=[{"name": i, "id": i} for i in result.columns],
-    )
+        # Return results in a table
+        return dash_table.DataTable(
+            data=result.to_dict("records"),
+            columns=[{"name": i, "id": i} for i in result.columns],
+        )
+
+    except Exception as e:
+        # Handle errors
+        return f"Error processing file: {str(e)}"
 
 
 # Run app (for local testing)
