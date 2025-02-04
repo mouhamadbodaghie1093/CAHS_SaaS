@@ -23,20 +23,36 @@ login_layout = html.Div(
             dbc.Col(
                 dbc.Form(
                     [
-                        dbc.FormGroup(
-                            [
-                                dbc.Label("Username"),
+                        dbc.Row(
+                            dbc.Col(
+                                dbc.Label("Username", html_for="username"),
+                                width=12
+                            )
+                        ),
+                        dbc.Row(
+                            dbc.Col(
                                 dbc.Input(id="username", placeholder="Enter Username", type="text"),
-                            ]
+                                width=12
+                            )
                         ),
-                        dbc.FormGroup(
-                            [
-                                dbc.Label("Password"),
+                        dbc.Row(
+                            dbc.Col(
+                                dbc.Label("Password", html_for="password"),
+                                width=12
+                            )
+                        ),
+                        dbc.Row(
+                            dbc.Col(
                                 dbc.Input(id="password", placeholder="Enter Password", type="password"),
-                            ]
+                                width=12
+                            )
                         ),
-                        dbc.Button("Login", id="login-button", color="primary", style={'width': '100%'}),
-                        # Updated here
+                        dbc.Row(
+                            dbc.Col(
+                                dbc.Button("Login", id="login-button", color="primary", style={'width': '100%'}),
+                                width=12
+                            )
+                        ),
                     ]
                 ),
                 width={"size": 6, "offset": 3},
@@ -57,7 +73,6 @@ main_layout = html.Div(
 # Define the app layout initially as the login page
 app.layout = login_layout
 
-
 # Define the login callback to verify username and password
 @app.callback(
     Output("app-container", "children"),
@@ -77,8 +92,6 @@ def login(n_clicks, username, password):
             login_layout
         ])  # Keep the login page if invalid credentials
 
-
 # Run the app on the server
 if __name__ == "__main__":
     app.run_server(debug=True)
-# Run the app on the server
