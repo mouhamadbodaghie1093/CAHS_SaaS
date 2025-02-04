@@ -11,7 +11,7 @@ server = app.server  # Needed for deployment
 
 # Layout of the web app
 app.layout = html.Div([
-    html.H1("FastQ File Processor"),
+    html.H1("Bacteria Analysis Main Page"),
     dcc.Upload(
         id='upload-data',
         children=html.Button('Upload File'),
