@@ -81,3 +81,4 @@ def login(n_clicks, username, password):
 # Run the app on the server
 if __name__ == "__main__":
     app.run_server(debug=True)
+# Run the app on the server
