@@ -2,6 +2,7 @@ numpy
 pandas
 scipy
 dash
+asgiref
 fastapi
 gunicorn
 flask
