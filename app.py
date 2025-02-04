@@ -23,17 +23,20 @@ login_layout = html.Div(
             dbc.Col(
                 dbc.Form(
                     [
-                        dbc.FormGroup(
+                        # Replacing FormGroup with Row and Col for layout
+                        dbc.Row(
                             [
-                                dbc.Label("Username"),
-                                dbc.Input(id="username", placeholder="Enter Username", type="text"),
-                            ]
+                                dbc.Col(dbc.Label("Username"), width="auto"),
+                                dbc.Col(dbc.Input(id="username", placeholder="Enter Username", type="text")),
+                            ],
+                            align="center"
                         ),
-                        dbc.FormGroup(
+                        dbc.Row(
                             [
-                                dbc.Label("Password"),
-                                dbc.Input(id="password", placeholder="Enter Password", type="password"),
-                            ]
+                                dbc.Col(dbc.Label("Password"), width="auto"),
+                                dbc.Col(dbc.Input(id="password", placeholder="Enter Password", type="password")),
+                            ],
+                            align="center"
                         ),
                         dbc.Button("Login", id="login-button", color="primary", block=True),
                     ]
