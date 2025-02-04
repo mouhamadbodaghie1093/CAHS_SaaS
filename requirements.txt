@@ -1,6 +1,7 @@
 numpy
 pandas
 scipy
+dash
 fastapi
 gunicorn
 uvicorn
