@@ -15,16 +15,14 @@ login_layout = dbc.Container([
     html.H2("CAHS_SaaS Login Page", className="text-center mt-5"),
     dbc.Row(
         dbc.Col(
-            dbc.Form(
-                [
-                    dbc.Label("Username", html_for="username"),
-                    dbc.Input(id="username", placeholder="Enter Username", type="text", className="mb-3"),
-                    dbc.Label("Password", html_for="password"),
-                    dbc.Input(id="password", placeholder="Enter Password", type="password", className="mb-3"),
-                    dbc.Button("Login", id="login-button", color="primary", className="w-100"),
-                    html.Div(id="login-message", className="text-danger text-center mt-3"),
-                ]
-            ),
+            dbc.Form([
+                dbc.Label("Username", html_for="username"),
+                dbc.Input(id="username", placeholder="Enter Username", type="text", className="mb-3"),
+                dbc.Label("Password", html_for="password"),
+                dbc.Input(id="password", placeholder="Enter Password", type="password", className="mb-3"),
+                dbc.Button("Login", id="login-button", color="primary", className="w-100"),
+                html.Div(id="login-message", className="text-danger text-center mt-3"),
+            ]),
             width=4,
         ),
         className="justify-content-center"
@@ -71,25 +69,61 @@ menu_layout = dbc.Container([
     ),
 ], fluid=True)
 
-# ----------------- PLACEHOLDER PAGES ----------------- #
+# ----------------- BACTERIA ANALYSIS PAGE ----------------- #
 bacteria_analysis_layout = dbc.Container([
-    html.H1("Bacteria Analysis Page", className="text-center mt-5"),
-    dbc.Button("Back to Menu", href="/menu", color="secondary", className="d-block mx-auto mt-3"),
-])
+    html.H1("Bacteria Analysis", className="text-center mt-5"),
 
+    # File Upload
+    dbc.Row([
+        dbc.Col([
+            dcc.Upload(
+                id='upload-data',
+                children=html.Button('Upload Bacteria Data', className="btn btn-primary"),
+                multiple=False
+            ),
+            html.Div(id='upload-message', className="mt-3"),
+        ], width=6)
+    ], className="justify-content-center mt-4"),
+
+    # Data Visualization
+    dbc.Row([
+        dbc.Col(dcc.Graph(id='abundance-plot'), width=6),
+        dbc.Col(dcc.Graph(id='density-plot'), width=6),
+    ], className="mt-4"),
+
+    # Run Nextflow Pipeline
+    dbc.Row([
+        dbc.Col([
+            dbc.Button("Run Nextflow Analysis", id="run-nextflow", color="success", className="d-block mx-auto mt-3"),
+            html.Div(id="nextflow-status", className="text-center mt-3")
+        ], width=4)
+    ], className="justify-content-center mt-4"),
+
+    dbc.Button("Back to Menu", href="/menu", color="secondary", className="d-block mx-auto mt-4"),
+], fluid=True)
+
+# ----------------- SNP ANALYSIS PAGE ----------------- #
 snp_analysis_layout = dbc.Container([
     html.H1("SNP Analysis Page", className="text-center mt-5"),
     dbc.Button("Back to Menu", href="/menu", color="secondary", className="d-block mx-auto mt-3"),
 ])
 
-# ----------------- APP LAYOUT ----------------- #
+# ----------------- PAGE ROUTING ----------------- #
+pages = {
+    "/menu": menu_layout,
+    "/bacteria": bacteria_analysis_layout,
+    "/snp": snp_analysis_layout
+}
+
+# Main layout
 app.layout = html.Div([
     dcc.Location(id="url", refresh=False),  # Handles URL changes
-    html.Div(id="app-container")  # Holds active page
+    html.Div(id="app-container")  # Holds active page content
 ])
 
-
 # ----------------- CALLBACKS ----------------- #
+
+# Login authentication
 @app.callback(
     Output("url", "pathname"),
     [Input("login-button", "n_clicks")],
@@ -101,19 +135,13 @@ def login(n_clicks, username, password):
     return dash.no_update  # No change if login fails
 
 
+# Page rendering based on URL
 @app.callback(
     Output("app-container", "children"),
     [Input("url", "pathname")]
 )
 def display_page(pathname):
-    if pathname == "/menu":
-        return menu_layout
-    elif pathname == "/bacteria":
-        return bacteria_analysis_layout
-    elif pathname == "/snp":
-        return snp_analysis_layout
-    return login_layout  # Default to login page
-
+    return pages.get(pathname, login_layout)  # Default to login page if path is unknown
 
 # ---------------- RUN APP ---------------- #
 if __name__ == "__main__":
