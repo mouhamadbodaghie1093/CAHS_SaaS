@@ -3,5 +3,4 @@ pandas==1.5.3
 plotly==5.9.0
 numpy==1.24.1
 subprocess.run
-nextflow==21.10.6
 requests==2.28.2
