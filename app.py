@@ -15,7 +15,7 @@ login_layout = html.Div(
     [
         dbc.Row(
             dbc.Col(
-                html.H2("Login Page"),
+                html.H2("CAHS_SaaS Login Page"),
                 width={"size": 6, "offset": 3},
             )
         ),
