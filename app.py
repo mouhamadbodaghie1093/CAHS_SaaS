@@ -1,3 +1,6 @@
+import os
+import subprocess
+
 import dash
 import dash_bootstrap_components as dbc
 from dash import html, dcc
@@ -8,7 +11,7 @@ from flask import Flask
 server = Flask(__name__)
 
 # Initialize Dash app with Bootstrap theme
-app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
 
 # ---------------- LOGIN PAGE ---------------- #
 login_layout = dbc.Container([
@@ -95,7 +98,7 @@ bacteria_analysis_layout = dbc.Container([
     dbc.Row([
         dbc.Col([
             dbc.Button("Run Nextflow Analysis", id="run-nextflow", color="success", className="d-block mx-auto mt-3"),
-            html.Div(id="nextflow-status", className="text-center mt-3")
+            html.Div(id="nextflow-status", className="text-center mt-3")  # Updated Output ID
         ], width=4)
     ], className="justify-content-center mt-4"),
 
@@ -130,10 +133,9 @@ app.layout = html.Div([
     [State("username", "value"), State("password", "value")]
 )
 def login(n_clicks, username, password):
-    if n_clicks and username == "cash" and password == "cash":
+    if n_clicks and username == "cash" and password == "cash":  # Consider replacing with a secure method
         return "/menu"  # Redirect to menu page
     return dash.no_update  # No change if login fails
-
 
 # Page rendering based on URL
 @app.callback(
@@ -143,6 +145,74 @@ def login(n_clicks, username, password):
 def display_page(pathname):
     return pages.get(pathname, login_layout)  # Default to login page if path is unknown
 
+
+# Run Nextflow Pipeline
+@app.callback(
+    Output("nextflow-status", "children"),
+    Output("abundance-plot", "figure"),
+    [Input("run-nextflow", "n_clicks")]
+)
+def run_nextflow(n_clicks):
+    if not n_clicks:
+        return "", dash.no_update
+
+    script_path = os.path.abspath("bacteria_analysis.nf")
+
+    # Check if script exists
+    if not os.path.exists(script_path):
+        current_dir = os.getcwd()
+        files_in_dir = os.listdir(current_dir)
+        return f"Error: Nextflow script not found at {script_path}. Current Directory: {current_dir}. Files: {files_in_dir}", dash.no_update
+
+    try:
+        result = subprocess.run(
+            ["nextflow", "run", script_path],
+            capture_output=True,
+            text=True
+        )
+
+        if result.returncode != 0:
+            return f"Error running Nextflow:\n{result.stderr}", dash.no_update
+
+        success_message = [line for line in result.stdout.splitlines() if "✔" in line]
+        if success_message:
+            # Check if results directory and plot file exist
+            result_dir = os.path.join(os.getcwd(), "results")
+            if os.path.exists(result_dir):
+                files_in_result = os.listdir(result_dir)
+                if "abundance_plot.png" in files_in_result:
+                    return f"Nextflow completed successfully: {success_message[-1]}", {
+                        'data': [{
+                            'x': [0, 1, 2],  # Replace with your dynamic data
+                            'y': [2, 4, 8],  # Replace with your dynamic data
+                            'type': 'scatter',
+                            'mode': 'lines+markers',
+                            'name': 'Abundance'
+                        }],
+                        'layout': {
+                            'title': 'Abundance Plot'
+                        }
+                    }
+                else:
+                    # Simulate result for testing
+                    return f"Nextflow completed, but no 'abundance_plot.png' found in the results directory. Files: {files_in_result}", {
+                        'data': [{
+                            'x': [0, 1, 2],  # Simulated Data
+                            'y': [1, 2, 3],  # Simulated Data
+                            'type': 'scatter',
+                            'mode': 'lines+markers',
+                            'name': 'Simulated Abundance'
+                        }],
+                        'layout': {
+                            'title': 'Abundance Plot (Simulated)'
+                        }
+                    }
+            else:
+                return f"Nextflow completed, but 'results' directory is missing.", dash.no_update
+
+        return f"Nextflow Output:\n{result.stdout}", dash.no_update
+    except Exception as e:
+        return f"Unexpected error: {str(e)}", dash.no_update
 # ---------------- RUN APP ---------------- #
 if __name__ == "__main__":
     app.run_server(debug=True)

@@ -1,6 +1,7 @@
- dash==2.10.0
-dash-bootstrap-components==1.6.0
-flask==2.2.2
-gunicorn==20.1.0
-Pandas
-
+dash==2.9.3
+pandas==1.5.3
+plotly==5.9.0
+numpy==1.24.1
+subprocess.run
+nextflow==21.10.6
+requests==2.28.2

@@ -1,3 +1,5 @@
+import base64
+import io
 import os
 import subprocess
 
@@ -18,17 +20,35 @@ app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTST
 # ----------------- BACTERIA ANALYSIS PAGE ----------------- #
 bacteria_analysis_layout = dbc.Container([
     html.H1("Bacteria Analysis", className="text-center mt-5"),
-    dcc.Upload(
-        id="upload-data",
-        children=html.Button("Upload CSV File", className="btn btn-primary mt-3"),
-        multiple=False,
-    ),
-    html.Div(id="file-name", className="text-center mt-2"),
-    html.Div(id="data-table"),
-    dcc.Graph(id="density-plot"),
-    dbc.Button("Run Nextflow Analysis", id="run-nextflow", color="success", className="mt-3"),
-    html.Div(id="nextflow-output", className="text-center mt-2"),
-    dbc.Button("Back to Menu", href="/menu", color="secondary", className="d-block mx-auto mt-3"),
+
+    # File Upload
+    dbc.Row([
+        dbc.Col([
+            dcc.Upload(
+                id="upload-data",
+                children=html.Button("Upload CSV File", className="btn btn-primary mt-3"),
+                multiple=False,
+            ),
+            html.Div(id="file-name", className="text-center mt-2"),
+        ], width=6)
+    ], className="justify-content-center mt-4"),
+
+    # Display Data Table and Plot
+    dbc.Row([
+        dbc.Col(html.Div(id="data-table"), width=6),
+        dbc.Col(dcc.Graph(id="density-plot"), width=6),
+    ], className="mt-4"),
+
+    # Run Nextflow Button
+    dbc.Row([
+        dbc.Col([
+            dbc.Button("Run Nextflow Analysis", id="run-nextflow", color="success", className="mt-3 d-block mx-auto"),
+            html.Div(id="nextflow-output", className="text-center mt-2"),
+        ], width=6)
+    ], className="justify-content-center mt-4"),
+
+    # Back Button
+    dbc.Button("Back to Menu", href="/menu", color="secondary", className="d-block mx-auto mt-4"),
 ], fluid=True)
 
 
@@ -40,20 +60,29 @@ bacteria_analysis_layout = dbc.Container([
 )
 def process_uploaded_file(contents, filename):
     if contents is None:
-        return "", "", px.scatter()
+        return "", "", px.scatter(title="No Data Available")
 
-    # Simulating file save & read (for simplicity, assuming CSV format)
-    file_path = f"./uploads/{filename}"
-    os.makedirs("./uploads", exist_ok=True)
-    with open(file_path, "w") as f:
-        f.write(contents.split(",")[-1])
+    try:
+        # Decode base64 CSV content
+        content_type, content_string = contents.split(",")
+        decoded = base64.b64decode(content_string)
+        df = pd.read_csv(io.StringIO(decoded.decode("utf-8")))
 
-    df = pd.read_csv(file_path)
+        # Create a density plot using the first numerical column
+        numeric_columns = df.select_dtypes(include=["number"]).columns
+        if numeric_columns.empty:
+            return f"Uploaded: {filename} (No numeric data found)", dbc.Table.from_dataframe(df.head(), striped=True,
+                                                                                             bordered=True,
+                                                                                             hover=True), px.scatter(
+                title="No Numeric Data")
 
-    # Create density plot
-    fig = px.histogram(df, x=df.columns[1], title="Bacteria Abundance Density")
+        fig = px.histogram(df, x=numeric_columns[0], title=f"Bacteria Abundance Density ({numeric_columns[0]})")
 
-    return f"Uploaded: {filename}", dbc.Table.from_dataframe(df.head(), striped=True, bordered=True, hover=True), fig
+        return f"Uploaded: {filename}", dbc.Table.from_dataframe(df.head(), striped=True, bordered=True,
+                                                                 hover=True), fig
+
+    except Exception as e:
+        return f"Error processing file: {str(e)}", "", px.scatter(title="Error Processing Data")
 
 
 @app.callback(
@@ -65,26 +94,36 @@ def run_nextflow(n_clicks):
         return ""
 
     try:
-        result = subprocess.run(["nextflow", "run", "bacteria_analysis.nf"], capture_output=True, text=True)
+        script_path = os.path.abspath("bacteria_analysis.nf")
+
+        if not os.path.exists(script_path):
+            return f"Error: Nextflow script not found at {script_path}"
+
+        result = subprocess.run(["nextflow", "run", script_path], capture_output=True, text=True)
+
+        if result.returncode != 0:
+            return f"Error running Nextflow:\n{result.stderr}"
+
         return f"Nextflow Output:\n{result.stdout}"
+
     except Exception as e:
-        return f"Error running Nextflow: {str(e)}"
+        return f"Unexpected error: {str(e)}"
 
 
-# ----------------- ADD TO EXISTING DASH APP ----------------- #
-existing_pages = {"/bacteria": bacteria_analysis_layout}
+# ----------------- PAGE ROUTING ----------------- #
+pages = {
+    "/bacteria": bacteria_analysis_layout,
+}
 
-
-def display_page(pathname):
-    return existing_pages.get(pathname, login_layout)
-
-
-app.layout = html.Div([dcc.Location(id="url", refresh=False), html.Div(id="app-container")])
+app.layout = html.Div([
+    dcc.Location(id="url", refresh=False),
+    html.Div(id="app-container")
+])
 
 
 @app.callback(Output("app-container", "children"), [Input("url", "pathname")])
-def update_page(pathname):
-    return display_page(pathname)
+def display_page(pathname):
+    return pages.get(pathname, html.H2("Page Not Found"))  # Default error page
 
 
 # ---------------- RUN APP ---------------- #
