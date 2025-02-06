@@ -2,13 +2,15 @@
 
 set -e  # Exit on error
 
-# Install Java manually
+# Define JAVA_HOME in a writable directory
+export JAVA_HOME="$HOME/java"
+export PATH="$JAVA_HOME/bin:$PATH"
+
+# Download and install Java in the writable directory
 echo "Downloading and installing Java..."
 curl -o openjdk.tar.gz https://download.java.net/openjdk/jdk11/ri/openjdk-11+28_linux-x64_bin.tar.gz
-mkdir -p /opt/java
-tar -xzf openjdk.tar.gz -C /opt/java --strip-components=1
-export JAVA_HOME="/opt/java"
-export PATH="$JAVA_HOME/bin:$PATH"
+mkdir -p "$JAVA_HOME"
+tar -xzf openjdk.tar.gz -C "$JAVA_HOME" --strip-components=1
 
 # Verify Java installation
 java -version
