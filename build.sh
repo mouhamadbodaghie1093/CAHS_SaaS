@@ -21,7 +21,7 @@ java -version
 echo "Checking if Nextflow exists..."
 if [ ! -f "./nextflow" ]; then
     echo "Nextflow not found in repository! Downloading..."
-    curl -s https://get.nextflow.io -o nextflow
+    curl -v https://get.nextflow.io -o nextflow
     if [ $? -ne 0 ]; then
         echo "Failed to download Nextflow."
         exit 1
@@ -30,9 +30,11 @@ fi
 
 echo "Making Nextflow executable..."
 chmod +x nextflow
+ls -l nextflow  # Ensure permissions are correct
 
 echo "Running Nextflow..."
-./nextflow -version
+./nextflow -version 2> nextflow_error.log
+echo "Nextflow error log saved to nextflow_error.log"
 
 # Ensure Python is installed
 echo "Checking if Python is installed..."
@@ -46,5 +48,8 @@ echo "Installing Python dependencies..."
 pip3 install --upgrade pip
 pip3 install gunicorn dash dash-bootstrap-components
 
+# List installed Python packages
+pip3 list
+
 echo "Starting Gunicorn..."
-gunicorn -w 4 app:server
+gunicorn --reload -w 4 app:server
