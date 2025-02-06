@@ -214,5 +214,8 @@ def run_nextflow(n_clicks):
     except Exception as e:
         return f"Unexpected error: {str(e)}", dash.no_update
 # ---------------- RUN APP ---------------- #
+@app.route('/health')
+def health():
+    return 'OK', 200
 if __name__ == "__main__":
     app.run_server(debug=True)
