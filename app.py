@@ -213,9 +213,14 @@ def run_nextflow(n_clicks):
         return f"Nextflow Output:\n{result.stdout}", dash.no_update
     except Exception as e:
         return f"Unexpected error: {str(e)}", dash.no_update
+
+
+# ----------------- HEALTH CHECK ROUTE ----------------- #
+@server.route('/health')
+def health_check():
+    return "OK", 200
+
 # ---------------- RUN APP ---------------- #
-@app.route('/health')
-def health():
-    return 'OK', 200
+
 if __name__ == "__main__":
     app.run_server(debug=True)
