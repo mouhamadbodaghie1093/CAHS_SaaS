@@ -52,4 +52,10 @@ pip3 install gunicorn dash dash-bootstrap-components
 pip3 list
 
 echo "Starting Gunicorn on port 8080..."
-gunicorn --reload -w 4 --bind 0.0.0.0:8080 app:server
+
+# Running Gunicorn without --reload (this avoids the restart loop issue in production)
+gunicorn -w 4 --bind 0.0.0.0:8080 app:server
+
+# If you want to continue with a development environment that needs automatic reloading,
+# you can uncomment the following line to use the --reload flag:
+# gunicorn --reload -w 4 --bind 0.0.0.0:8080 app:server
