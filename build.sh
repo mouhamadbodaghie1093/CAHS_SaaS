@@ -51,5 +51,5 @@ pip3 install gunicorn dash dash-bootstrap-components
 # List installed Python packages
 pip3 list
 
-echo "Starting Gunicorn..."
-gunicorn --reload -w 4 app:server
+echo "Starting Gunicorn on port 8080..."
+gunicorn --reload -w 4 --bind 0.0.0.0:8080 app:server
