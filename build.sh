@@ -1,30 +1,27 @@
 #!/bin/bash
 
-# Install OpenJDK (Java)
+# Install Java (required for Nextflow)
 echo "Installing Java..."
 apt-get update && apt-get install -y openjdk-11-jre-headless
 
 # Verify Java installation
 java -version
 
-# Install Nextflow
-echo "Downloading Nextflow..."
-curl -s https://get.nextflow.io | bash
-
-# Check if the Nextflow binary exists
+# Make sure Nextflow exists in the repository root
 if [ -f "./nextflow" ]; then
-    echo "Nextflow installed successfully."
+    echo "Nextflow found in repository."
 else
-    echo "Nextflow installation failed!"
+    echo "Nextflow not found in repository!"
     exit 1
 fi
 
-# Move Nextflow to /usr/local/bin so it's globally accessible
+# Make Nextflow executable
+chmod +x nextflow
+
+# Move Nextflow to a system path
 mv nextflow /usr/local/bin/
 
-# Verify that Nextflow is available in the path
+# Verify installation
 which nextflow
 ls -l /usr/local/bin/nextflow
-
-# Install any Python dependencies (if applicable)
-pip install -r requirements.txt
+nextflow -version
