@@ -23,3 +23,10 @@ chmod +x nextflow
 
 echo "Running Nextflow..."
 ./nextflow -version
+
+echo "Installing Python dependencies..."
+pip install --upgrade pip
+pip install gunicorn dash dash-bootstrap-components
+
+echo "Starting Gunicorn..."
+gunicorn -w 4 app:server
