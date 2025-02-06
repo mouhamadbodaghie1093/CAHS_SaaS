@@ -16,3 +16,4 @@
 2025-02-05 21:06:39	2.1s	gloomy_brown	OK	8db184d1f4fda7e8b868d26141a6987d	203b9e3d-86cb-449e-8cc3-fbf6bc83d92d	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
 2025-02-05 21:06:55	2.1s	condescending_lalande	OK	8db184d1f4fda7e8b868d26141a6987d	8fc83044-1c8c-4c92-9d13-29dde26fba32	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
 2025-02-05 21:07:13	2s	stupefied_galileo	OK	8db184d1f4fda7e8b868d26141a6987d	6346083a-5b59-495e-b04f-076406b6219f	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
+2025-02-06 21:20:35	2s	stupefied_agnesi	OK	8db184d1f4fda7e8b868d26141a6987d	8e65d7a3-7861-43d4-8cff-bf76674ecafa	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
