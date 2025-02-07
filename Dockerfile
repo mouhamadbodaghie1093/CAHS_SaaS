@@ -1,10 +1,11 @@
-# Use an official Debian base image
+# Use a stable Debian-based image
 FROM debian:bookworm-slim
 
 WORKDIR /workspace
 
-# Install required dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Fix missing package sources & install dependencies
+RUN apt-get clean && apt-get update --fix-missing && \
+    apt-get install -y --no-install-recommends \
     curl \
     bash \
     ca-certificates \
