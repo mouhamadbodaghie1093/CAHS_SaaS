@@ -1,10 +1,13 @@
-# Use a stable Debian-based image
+# Use a stable base image
 FROM debian:bookworm-slim
 
 WORKDIR /workspace
 
-# Fix missing package sources & install dependencies
-RUN apt-get clean && apt-get update --fix-missing && \
+# Manually update sources.list (fixes broken repo issues)
+RUN echo "deb http://deb.debian.org/debian bookworm main" > /etc/apt/sources.list && \
+    echo "deb http://security.debian.org/debian-security bookworm-security main" >> /etc/apt/sources.list && \
+    echo "deb http://deb.debian.org/debian bookworm-updates main" >> /etc/apt/sources.list && \
+    apt-get update && \
     apt-get install -y --no-install-recommends \
     curl \
     bash \
