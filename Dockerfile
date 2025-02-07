@@ -1,12 +1,13 @@
-# Use an official base image with required tools
-FROM debian:latest
+# Use an official Debian base image
+FROM debian:bookworm-slim
 
 WORKDIR /workspace
 
 # Install required dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     bash \
+    ca-certificates \
     openjdk-11-jre \
     && rm -rf /var/lib/apt/lists/*
 
