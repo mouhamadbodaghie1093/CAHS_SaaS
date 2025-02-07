@@ -38,5 +38,5 @@ pip3 install --upgrade pip
 pip3 install gunicorn dash dash-bootstrap-components
 
 # Start Gunicorn
-echo "Starting Gunicorn..."
-gunicorn -w 4 --bind 0.0.0.0:8080 app:server
+#echo "Starting Gunicorn..."
+#gunicorn -w 4 --bind 0.0.0.0:8080 app:server
