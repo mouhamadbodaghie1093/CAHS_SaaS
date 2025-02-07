@@ -12,13 +12,13 @@ RUN apt-get update && \
     python3 \
     python3-pip \
     python3-dev \
+    python3-venv \
     build-essential \
     openjdk-17-jre \
     && rm -rf /var/lib/apt/lists/*
 
 # Check pip version and upgrade if necessary
-RUN python3 -m ensurepip --upgrade && \
-    python3 -m pip install --upgrade pip
+RUN python3 -m pip install --upgrade pip
 
 # Install Dash dependencies
 RUN pip3 install dash dash-bootstrap-components flask
