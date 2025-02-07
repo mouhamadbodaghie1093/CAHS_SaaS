@@ -24,6 +24,9 @@ RUN python3 -m venv /opt/venv && \
 # Install Dash dependencies inside the virtual environment
 RUN /opt/venv/bin/pip install dash dash-bootstrap-components flask
 
+# Install matplotlib for plotting
+RUN /opt/venv/bin/pip install matplotlib
+
 # Install Nextflow
 RUN curl -fsSL https://get.nextflow.io | bash && \
     mv nextflow /usr/local/bin/ && \
