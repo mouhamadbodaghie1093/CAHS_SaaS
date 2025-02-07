@@ -147,6 +147,7 @@ def display_page(pathname):
 
 
 # Run Nextflow Pipeline
+# Run Nextflow Pipeline
 @app.callback(
     Output("nextflow-status", "children"),
     Output("abundance-plot", "figure"),
@@ -181,10 +182,11 @@ def run_nextflow(n_clicks):
             if os.path.exists(result_dir):
                 files_in_result = os.listdir(result_dir)
                 if "abundance_plot.png" in files_in_result:
-                    return f"Nextflow completed successfully: {success_message[-1]}", {
+                    # Read the plot into a Dash plot
+                    figure = {
                         'data': [{
-                            'x': [0, 1, 2],  # Replace with your dynamic data
-                            'y': [2, 4, 8],  # Replace with your dynamic data
+                            'x': [0, 1, 2],  # Replace with actual data from your plot
+                            'y': [2, 4, 8],  # Replace with actual data from your plot
                             'type': 'scatter',
                             'mode': 'lines+markers',
                             'name': 'Abundance'
@@ -193,8 +195,9 @@ def run_nextflow(n_clicks):
                             'title': 'Abundance Plot'
                         }
                     }
+                    return f"Nextflow completed successfully: {success_message[-1]}", figure
                 else:
-                    # Simulate result for testing
+                    # Simulate result for testing if the plot isn't found
                     return f"Nextflow completed, but no 'abundance_plot.png' found in the results directory. Files: {files_in_result}", {
                         'data': [{
                             'x': [0, 1, 2],  # Simulated Data
