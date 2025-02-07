@@ -1,11 +1,14 @@
+import base64
 import os
 import subprocess
+from io import BytesIO
 
 import dash
 import dash_bootstrap_components as dbc
+import matplotlib.pyplot as plt
 from dash import html, dcc
 from dash.dependencies import Input, Output, State
-from flask import Flask, send_file
+from flask import Flask
 
 # Create a Flask server instance
 server = Flask(__name__)
@@ -27,6 +30,46 @@ login_layout = dbc.Container([
                 html.Div(id="login-message", className="text-danger text-center mt-3"),
             ]),
             width=4,
+        ),
+        className="justify-content-center"
+    ),
+], fluid=True)
+
+# ---------------- MENU PAGE ---------------- #
+menu_layout = dbc.Container([
+    html.H2("Welcome to the CAHS_SaaS Platform", className="text-center mt-5"),
+    html.P("Choose an analysis option below:", className="text-center"),
+
+    dbc.Row([
+        dbc.Col(
+            dbc.Card(
+                dbc.CardBody([
+                    html.H4("Bacteria Analysis", className="card-title text-center"),
+                    html.P("Perform in-depth bacterial data analysis.", className="text-center"),
+                    dbc.Button("Go to Bacteria Analysis", href="/bacteria", color="primary",
+                               className="d-block mx-auto"),
+                ]),
+                className="shadow-lg",
+            ),
+            width=5
+        ),
+        dbc.Col(
+            dbc.Card(
+                dbc.CardBody([
+                    html.H4("SNP Analysis", className="card-title text-center"),
+                    html.P("Analyze SNP variations efficiently.", className="text-center"),
+                    dbc.Button("Go to SNP Analysis", href="/snp", color="success", className="d-block mx-auto"),
+                ]),
+                className="shadow-lg",
+            ),
+            width=5
+        ),
+    ], className="justify-content-center mt-4"),
+
+    dbc.Row(
+        dbc.Col(
+            dbc.Button("Logout", href="/", color="danger", className="mt-4 d-block mx-auto"),
+            width=3
         ),
         className="justify-content-center"
     ),
@@ -58,26 +101,24 @@ bacteria_analysis_layout = dbc.Container([
     dbc.Row([
         dbc.Col([
             dbc.Button("Run Nextflow Analysis", id="run-nextflow", color="success", className="d-block mx-auto mt-3"),
-            html.Div(id="nextflow-status", className="text-center mt-3")
-        ], width=4)
-    ], className="justify-content-center mt-4"),
-
-    # Button to download the result
-    dbc.Row([
-        dbc.Col([
-            dbc.Button("Download Results", id="download-results", color="primary", className="d-block mx-auto mt-3",
-                       disabled=True),
-            html.Div(id="download-link", className="mt-3")
+            html.Div(id="nextflow-status", className="text-center mt-3")  # Updated Output ID
         ], width=4)
     ], className="justify-content-center mt-4"),
 
     dbc.Button("Back to Menu", href="/menu", color="secondary", className="d-block mx-auto mt-4"),
 ], fluid=True)
 
+# ----------------- SNP ANALYSIS PAGE ----------------- #
+snp_analysis_layout = dbc.Container([
+    html.H1("SNP Analysis Page", className="text-center mt-5"),
+    dbc.Button("Back to Menu", href="/menu", color="secondary", className="d-block mx-auto mt-3"),
+])
+
 # ----------------- PAGE ROUTING ----------------- #
 pages = {
     "/menu": menu_layout,
     "/bacteria": bacteria_analysis_layout,
+    "/snp": snp_analysis_layout
 }
 
 # Main layout
@@ -107,23 +148,24 @@ def login(n_clicks, username, password):
 def display_page(pathname):
     return pages.get(pathname, login_layout)  # Default to login page if path is unknown
 
+
+# Run Nextflow Pipeline
 # Run Nextflow Pipeline
 @app.callback(
     Output("nextflow-status", "children"),
-    Output("abundance-plot", "figure"),
-    Output("download-results", "disabled"),
-    Output("download-link", "children"),
+    Output("abundance-plot", "src"),  # Modify this to use the 'src' property
     [Input("run-nextflow", "n_clicks")]
 )
 def run_nextflow(n_clicks):
     if not n_clicks:
-        return "", dash.no_update, True, ""
+        return "", dash.no_update
 
     script_path = os.path.abspath("bacteria_analysis.nf")
 
-    # Check if script exists
     if not os.path.exists(script_path):
-        return f"Error: Nextflow script not found at {script_path}.", dash.no_update, True, ""
+        current_dir = os.getcwd()
+        files_in_dir = os.listdir(current_dir)
+        return f"Error: Nextflow script not found at {script_path}. Current Directory: {current_dir}. Files: {files_in_dir}", dash.no_update
 
     try:
         result = subprocess.run(
@@ -133,45 +175,36 @@ def run_nextflow(n_clicks):
         )
 
         if result.returncode != 0:
-            return f"Error running Nextflow:\n{result.stderr}", dash.no_update, True, ""
+            return f"Error running Nextflow:\n{result.stderr}", dash.no_update
 
         success_message = [line for line in result.stdout.splitlines() if "✔" in line]
         if success_message:
-            # Check if results directory and plot file exist
-            result_dir = os.path.join(os.getcwd(), "results")
-            if os.path.exists(result_dir):
-                files_in_result = os.listdir(result_dir)
-                if "abundance_plot.png" in files_in_result:
-                    # Create a download link for the results
-                    download_url = "/download/results/abundance_plot.png"
-                    return f"Nextflow completed successfully: {success_message[-1]}", {
-                        'data': [{
-                            'x': [0, 1, 2],  # Replace with actual data from your plot
-                            'y': [2, 4, 8],  # Replace with actual data from your plot
-                            'type': 'scatter',
-                            'mode': 'lines+markers',
-                            'name': 'Abundance'
-                        }],
-                        'layout': {
-                            'title': 'Abundance Plot'
-                        }
-                    }, False, html.A("Click here to download the result", href=download_url, target="_blank")
-                else:
-                    return f"Nextflow completed, but no 'abundance_plot.png' found.", dash.no_update, True, ""
-            else:
-                return f"Nextflow completed, but 'results' directory is missing.", dash.no_update, True, ""
+            # Simulated result plot (replace with dynamic data after Nextflow run)
+            fig, ax = plt.subplots()
+            ax.plot([0, 1, 2], [2, 4, 8], label="Abundance")  # Simulated data
+            ax.set_title('Abundance Plot')
+            ax.legend()
 
-        return f"Nextflow Output:\n{result.stdout}", dash.no_update, True, ""
+            # Convert plot to PNG image and encode in base64
+            img_io = BytesIO()
+            fig.savefig(img_io, format='png')
+            img_io.seek(0)
+            encoded_img = base64.b64encode(img_io.getvalue()).decode('utf-8')
+            img_html = f"data:image/png;base64,{encoded_img}"
+
+            return f"Nextflow completed successfully: {success_message[-1]}", img_html
+
+        return f"Nextflow Output:\n{result.stdout}", dash.no_update
     except Exception as e:
-        return f"Unexpected error: {str(e)}", dash.no_update, True, ""
+        return f"Unexpected error: {str(e)}", dash.no_update
 
 
-# ----------------- DOWNLOAD RESULTS ----------------- #
-@app.server.route("/download/results/<filename>")
-def download_file(filename):
-    result_dir = os.path.join(os.getcwd(), "results")
-    return send_file(os.path.join(result_dir, filename), as_attachment=True)
+# ----------------- HEALTH CHECK ROUTE ----------------- #
+@server.route('/health')
+def health_check():
+    return "OK", 200
 
 # ---------------- RUN APP ---------------- #
+
 if __name__ == "__main__":
     app.run_server(debug=True)
