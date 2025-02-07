@@ -20,14 +20,15 @@ ENV PATH="${JAVA_HOME}/bin:${PATH}"
 # Install Nextflow
 RUN curl -fsSL https://get.nextflow.io | bash && \
     mv nextflow /usr/local/bin/ && \
-    chmod +x /usr/local/bin/nextflow
+    chmod +x /usr/local/bin/nextflow && \
+    chown root:root /usr/local/bin/nextflow
 
 # Verify installation
 RUN nextflow -version
 
-# Optionally: Create a non-root user and switch to it
-RUN useradd -ms /bin/bash nextflowuser
-USER nextflowuser
+# Optionally: Create a non-root user and switch to it (if desired)
+# RUN useradd -ms /bin/bash nextflowuser
+# USER nextflowuser
 
 # Default entrypoint to execute Nextflow
 ENTRYPOINT ["nextflow"]
