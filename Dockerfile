@@ -16,16 +16,18 @@ RUN apt-get update && \
     openjdk-17-jre \
     && rm -rf /var/lib/apt/lists/*
 
+# Upgrade pip and install dependencies
+RUN pip3 install --upgrade pip
+
 # Install Dash dependencies
-RUN pip3 install --upgrade pip && \
-    pip3 install dash dash-bootstrap-components flask
+RUN pip3 install dash dash-bootstrap-components flask
 
 # Install Nextflow
 RUN curl -fsSL https://get.nextflow.io | bash && \
     mv nextflow /usr/local/bin/ && \
     chmod +x /usr/local/bin/nextflow
 
-# Verify installation
+# Verify Nextflow installation
 RUN nextflow -version
 
 # Copy your app and other necessary files into the container
