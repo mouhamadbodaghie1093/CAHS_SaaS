@@ -11,16 +11,19 @@ RUN apt-get update && \
     ca-certificates \
     python3 \
     python3-pip \
+    python3-dev \
+    build-essential \
     openjdk-17-jre \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Dash dependencies
+RUN pip3 install --upgrade pip && \
+    pip3 install dash dash-bootstrap-components flask
 
 # Install Nextflow
 RUN curl -fsSL https://get.nextflow.io | bash && \
     mv nextflow /usr/local/bin/ && \
     chmod +x /usr/local/bin/nextflow
-
-# Install Dash dependencies
-RUN pip3 install dash dash-bootstrap-components flask
 
 # Verify installation
 RUN nextflow -version
