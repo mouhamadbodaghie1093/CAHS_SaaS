@@ -223,4 +223,4 @@ def health_check():
 # ---------------- RUN APP ---------------- #
 
 if __name__ == "__main__":
-    app.run_server(debug=False, use_reloader=False)  # Disable reloader for production
+    app.run_server(debug=True)
