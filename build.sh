@@ -4,7 +4,7 @@ set -e  # Exit on error
 
 # Define JAVA_HOME in a writable directory
 export JAVA_HOME="$HOME/java"
-export PATH="$JAVA_HOME/bin:$PATH"
+export PATH="$JAVA_HOME/bin:$HOME/.local/bin:$PATH"
 
 # Download and install Java in the writable directory
 echo "Downloading and installing Java..."
@@ -20,16 +20,22 @@ echo "Installing Nextflow..."
 curl -s https://get.nextflow.io | bash
 chmod +x nextflow
 
-# Create a writable directory for binaries if it doesn't exist
+# Ensure $HOME/.local/bin exists
 mkdir -p "$HOME/.local/bin"
 
-# Move Nextflow to the writable directory
+# Move Nextflow to a directory in PATH
 mv nextflow "$HOME/.local/bin/"
 
-# Ensure the directory is in PATH
-export PATH="$HOME/.local/bin:$PATH"
+# Double-check Nextflow installation
+if [ -f "$HOME/.local/bin/nextflow" ]; then
+    echo "Nextflow installed successfully!"
+else
+    echo "Nextflow installation failed!"
+    exit 1
+fi
 
-# Verify Nextflow installation
+# Verify Nextflow
+export PATH="$HOME/.local/bin:$PATH"
 nextflow -version
 
 # Install Python dependencies
