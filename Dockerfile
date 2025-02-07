@@ -17,11 +17,12 @@ RUN apt-get update && \
     openjdk-17-jre \
     && rm -rf /var/lib/apt/lists/*
 
-# Check pip version and upgrade if necessary
-RUN python3 -m pip install --upgrade pip
+# Create and activate a virtual environment
+RUN python3 -m venv /opt/venv && \
+    /opt/venv/bin/pip install --upgrade pip
 
-# Install Dash dependencies
-RUN pip3 install dash dash-bootstrap-components flask
+# Install Dash dependencies inside the virtual environment
+RUN /opt/venv/bin/pip install dash dash-bootstrap-components flask
 
 # Install Nextflow
 RUN curl -fsSL https://get.nextflow.io | bash && \
@@ -42,4 +43,4 @@ ENV FLASK_RUN_HOST=0.0.0.0
 EXPOSE 8050
 
 # Define the command to start the Dash application
-CMD ["python3", "app.py"]
+CMD ["/opt/venv/bin/python3", "app.py"]
