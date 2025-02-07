@@ -19,7 +19,15 @@ java -version
 echo "Installing Nextflow..."
 curl -s https://get.nextflow.io | bash
 chmod +x nextflow
-mv nextflow $HOME/.local/bin/
+
+# Create a writable directory for binaries if it doesn't exist
+mkdir -p "$HOME/.local/bin"
+
+# Move Nextflow to the writable directory
+mv nextflow "$HOME/.local/bin/"
+
+# Ensure the directory is in PATH
+export PATH="$HOME/.local/bin:$PATH"
 
 # Verify Nextflow installation
 nextflow -version
