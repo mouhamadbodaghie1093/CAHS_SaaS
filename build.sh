@@ -15,6 +15,15 @@ tar -xzf openjdk.tar.gz -C "$JAVA_HOME" --strip-components=1
 # Verify Java installation
 java -version
 
+# Install Nextflow
+echo "Installing Nextflow..."
+curl -s https://get.nextflow.io | bash
+chmod +x nextflow
+mv nextflow $HOME/.local/bin/
+
+# Verify Nextflow installation
+nextflow -version
+
 # Install Python dependencies
 echo "Installing Python dependencies..."
 pip3 install --upgrade pip
