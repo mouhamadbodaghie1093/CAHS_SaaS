@@ -1,4 +1,3 @@
-import os
 import subprocess
 
 import dash
@@ -98,7 +97,7 @@ bacteria_analysis_layout = dbc.Container([
     dbc.Row([
         dbc.Col([
             dbc.Button("Run Nextflow Analysis", id="run-nextflow", color="success", className="d-block mx-auto mt-3"),
-            html.Div(id="nextflow-status", className="text-center mt-3")  # Updated Output ID
+            html.Div(id="nextflow-status", className="text-center mt-3")
         ], width=4)
     ], className="justify-content-center mt-4"),
 
@@ -123,35 +122,28 @@ pages = {
 
 # Main layout
 app.layout = html.Div([
-    dcc.Location(id="url", refresh=False),  # Handles URL changes
-    html.Div(id="app-container")  # Holds active page content
+    dcc.Location(id="url", refresh=False),
+    html.Div(id="app-container")
 ])
 
-
 # ----------------- CALLBACKS ----------------- #
-
-# Login authentication
 @app.callback(
     Output("url", "pathname"),
     [Input("login-button", "n_clicks")],
     [State("username", "value"), State("password", "value")]
 )
 def login(n_clicks, username, password):
-    if n_clicks and username == "cash" and password == "cash":  # Consider replacing with a secure method
-        return "/menu"  # Redirect to menu page
-    return dash.no_update  # No change if login fails
+    if n_clicks and username == "cash" and password == "cash":
+        return "/menu"
+    return dash.no_update
 
-
-# Page rendering based on URL
 @app.callback(
     Output("app-container", "children"),
     [Input("url", "pathname")]
 )
 def display_page(pathname):
-    return pages.get(pathname, login_layout)  # Default to login page if path is unknown
+    return pages.get(pathname, login_layout)
 
-
-# Run Nextflow Pipeline
 @app.callback(
     [Output("nextflow-status", "children"),
      Output("download-zip", "data")],
@@ -160,52 +152,15 @@ def display_page(pathname):
 def run_nextflow(n_clicks):
     if not n_clicks:
         return "", dash.no_update
-
-    script_path = os.path.abspath("bacteria_analysis.nf")
-
-    if not os.path.exists(script_path):
-        return f"Error: Nextflow script not found at {script_path}.", dash.no_update
-
     try:
-        # Ensure results directory exists
-        results_dir = os.path.join(os.getcwd(), "results")
-        if not os.path.exists(results_dir):
-            os.makedirs(results_dir)
-
-        result = subprocess.run(
-            ["nextflow", "run", script_path],
-            capture_output=True,
-            text=True
-        )
-
-        # Debugging: Check current directory and files
-        print(f"Current working directory: {os.getcwd()}")
-        print(f"Files in current directory: {os.listdir(os.getcwd())}")
-
-        if result.returncode != 0:
-            return f"Error running Nextflow:\n{result.stderr}", dash.no_update
-
-        # Correct path to the output ZIP file
-        zip_file_path = os.path.join(results_dir, "output.zip")
-        print(f"Looking for output.zip at {zip_file_path}")
-
-        if not os.path.exists(zip_file_path):
-            return f"Error: Nextflow finished, but no output file found at {zip_file_path}.", dash.no_update
-
-        # Return status message and trigger download of the ZIP file
-        return "Nextflow completed successfully!", dcc.send_file(zip_file_path)
-
+        subprocess.run(["nextflow", "run", "bacteria_analysis.nf"], check=True)
+        return "Nextflow completed successfully!", dash.no_update
     except Exception as e:
-        return f"Unexpected error: {str(e)}", dash.no_update
+        return f"Error: {str(e)}", dash.no_update
 
-
-# ----------------- HEALTH CHECK ROUTE ----------------- #
 @server.route('/health')
 def health_check():
     return "OK", 200
-
-
-# ---------------- RUN APP ---------------- #
 
 if __name__ == "__main__":
     app.run_server(debug=True)
