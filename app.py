@@ -1,11 +1,8 @@
-import base64
 import os
 import subprocess
-from io import BytesIO
 
 import dash
 import dash_bootstrap_components as dbc
-import matplotlib.pyplot as plt
 from dash import html, dcc
 from dash.dependencies import Input, Output, State
 from flask import Flask
@@ -105,6 +102,9 @@ bacteria_analysis_layout = dbc.Container([
         ], width=4)
     ], className="justify-content-center mt-4"),
 
+    # Download ZIP file
+    dcc.Download(id="download-zip"),
+
     dbc.Button("Back to Menu", href="/menu", color="secondary", className="d-block mx-auto mt-4"),
 ], fluid=True)
 
@@ -127,6 +127,7 @@ app.layout = html.Div([
     html.Div(id="app-container")  # Holds active page content
 ])
 
+
 # ----------------- CALLBACKS ----------------- #
 
 # Login authentication
@@ -140,6 +141,7 @@ def login(n_clicks, username, password):
         return "/menu"  # Redirect to menu page
     return dash.no_update  # No change if login fails
 
+
 # Page rendering based on URL
 @app.callback(
     Output("app-container", "children"),
@@ -150,10 +152,9 @@ def display_page(pathname):
 
 
 # Run Nextflow Pipeline
-# Run Nextflow Pipeline
 @app.callback(
-    Output("nextflow-status", "children"),
-    Output("abundance-plot", "src"),  # Modify this to use the 'src' property
+    [Output("nextflow-status", "children"),
+     Output("download-zip", "data")],
     [Input("run-nextflow", "n_clicks")]
 )
 def run_nextflow(n_clicks):
@@ -163,38 +164,37 @@ def run_nextflow(n_clicks):
     script_path = os.path.abspath("bacteria_analysis.nf")
 
     if not os.path.exists(script_path):
-        current_dir = os.getcwd()
-        files_in_dir = os.listdir(current_dir)
-        return f"Error: Nextflow script not found at {script_path}. Current Directory: {current_dir}. Files: {files_in_dir}", dash.no_update
+        return f"Error: Nextflow script not found at {script_path}.", dash.no_update
 
     try:
+        # Ensure results directory exists
+        results_dir = os.path.join(os.getcwd(), "results")
+        if not os.path.exists(results_dir):
+            os.makedirs(results_dir)
+
         result = subprocess.run(
             ["nextflow", "run", script_path],
             capture_output=True,
             text=True
         )
 
+        # Debugging: Check current directory and files
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"Files in current directory: {os.listdir(os.getcwd())}")
+
         if result.returncode != 0:
             return f"Error running Nextflow:\n{result.stderr}", dash.no_update
 
-        success_message = [line for line in result.stdout.splitlines() if "✔" in line]
-        if success_message:
-            # Simulated result plot (replace with dynamic data after Nextflow run)
-            fig, ax = plt.subplots()
-            ax.plot([0, 1, 2], [2, 4, 8], label="Abundance")  # Simulated data
-            ax.set_title('Abundance Plot')
-            ax.legend()
+        # Correct path to the output ZIP file
+        zip_file_path = os.path.join(results_dir, "output.zip")
+        print(f"Looking for output.zip at {zip_file_path}")
 
-            # Convert plot to PNG image and encode in base64
-            img_io = BytesIO()
-            fig.savefig(img_io, format='png')
-            img_io.seek(0)
-            encoded_img = base64.b64encode(img_io.getvalue()).decode('utf-8')
-            img_html = f"data:image/png;base64,{encoded_img}"
+        if not os.path.exists(zip_file_path):
+            return f"Error: Nextflow finished, but no output file found at {zip_file_path}.", dash.no_update
 
-            return f"Nextflow completed successfully: {success_message[-1]}", img_html
+        # Return status message and trigger download of the ZIP file
+        return "Nextflow completed successfully!", dcc.send_file(zip_file_path)
 
-        return f"Nextflow Output:\n{result.stdout}", dash.no_update
     except Exception as e:
         return f"Unexpected error: {str(e)}", dash.no_update
 
@@ -203,6 +203,7 @@ def run_nextflow(n_clicks):
 @server.route('/health')
 def health_check():
     return "OK", 200
+
 
 # ---------------- RUN APP ---------------- #
 
