@@ -35,3 +35,16 @@
 2025-02-23 04:32:28	-	jolly_gutenberg	-	00af2af3a541813e4ba600b70cb5a83a	005a0458-32b1-4072-8db5-5d14c818bbef	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
 2025-02-23 04:34:27	-	happy_wing	-	f0e19f30023e1a9036c47d29103a68b5	6254421d-eb7a-4573-bd89-35224841209b	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
 2025-02-23 04:35:52	-	sleepy_shannon	-	9017c16fd20e7ead727671421559c125	16aea3e8-5d73-40a0-a146-978c7f05dfb0	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
+2025-02-23 04:46:02	-	gloomy_venter	-	9017c16fd20e7ead727671421559c125	67f02c04-60fb-4b80-abd6-8054ff1bb9d0	nextflow run bacteria_analysis.nf -with-trace -with-report
+2025-02-23 04:47:52	-	determined_celsius	-	7ef87ed41897b44490817462b9680215	f53e7300-3062-4753-9889-0c1b523432c9	nextflow run bacteria_analysis.nf -with-trace -with-report
+2025-02-23 04:48:20	-	compassionate_jang	-	7ef87ed41897b44490817462b9680215	e95c69ee-a4ec-460d-9450-96eb1ca02a45	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
+2025-02-23 04:49:24	5.1s	friendly_kimura	OK	60c7f5e68a2a0ebdc7ba3a2ed5e4d5f3	1641b922-f3d7-40ad-850b-bf8ee023465e	nextflow run bacteria_analysis.nf -with-trace -with-report
+2025-02-23 04:49:55	3.5s	adoring_wright	OK	60c7f5e68a2a0ebdc7ba3a2ed5e4d5f3	8f89d5b8-ae3f-477e-bada-999878622446	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
+2025-02-23 04:52:49	-	lethal_kowalevski	-	4f9f0aa0d959881d08ef48f58472d4be	b7b0d115-b330-43c1-a676-08e89867944d	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
+2025-02-23 04:53:18	-	naughty_tuckerman	-	4f9f0aa0d959881d08ef48f58472d4be	cf1a39f0-6385-4337-95f6-deffe3b6840b	nextflow run bacteria_analysis.nf -with-trace -with-report
+2025-02-23 04:54:14	-	irreverent_kimura	-	97d10264aeb215089f66c7d6dc6005b1	b3e1013a-f56e-4d54-8efa-01d4bb25f516	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
+2025-02-23 04:54:52	-	kickass_koch	-	97d10264aeb215089f66c7d6dc6005b1	5232d150-0c44-47ef-a553-95293467606a	nextflow run bacteria_analysis.nf -with-trace -with-report
+2025-02-23 04:55:42	4.5s	pensive_majorana	ERR	7f14d2e20ea0c3d8cda33420ae222f1d	ffc2142e-5420-4d66-98e3-494f6aa020a0	nextflow run bacteria_analysis.nf -with-trace -with-report
+2025-02-23 04:56:11	3.3s	extravagant_leibniz	ERR	7f14d2e20ea0c3d8cda33420ae222f1d	4779a8b2-4c82-4fd1-bee5-687fef0b7f99	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
+2025-02-23 04:57:55	4s	shrivelled_lamarck	ERR	c80a3d4450ff5b6767e8aca9da65bc4e	161cfc11-7aba-40a5-b01e-560b9c5da7a0	nextflow run bacteria_analysis.nf -with-trace -with-report
+2025-02-23 04:59:14	-	loving_brenner	-	b8175af47348facdf3758573f9a46124	3ac5a647-2150-4dde-bd99-61f6267e3747	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
