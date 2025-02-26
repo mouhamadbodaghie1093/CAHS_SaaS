@@ -126,6 +126,6 @@ def display_page(pathname):
     return pages.get(pathname, html.H2("Page Not Found"))  # Default error page
 
 
-# ---------------- RUN APP ---------------- #
+# ---------------- RUN APP ----------------- #
 if __name__ == "__main__":
     app.run_server(debug=True)

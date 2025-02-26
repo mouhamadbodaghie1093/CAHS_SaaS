@@ -1,31 +1,36 @@
-#!/usr/bin/env nextflow
+nextflow.enable.dsl = 2
 
-process zipOutput {
+params.input = ""
+params.output = "results"
+
+process analyze_bacteria {
+tag "$params.input"
+publishDir params.output, mode: 'copy'
+
+input:
+path input_file from file(params.input)  // Correcting how input is passed
+
     output:
-    file 'output.zip' into zip_output  // Ensure output is tracked
+path "analysis_results.html"
 
     script:
-    """
-    mkdir -p results
-    echo -e "sample_ID\\tabundance\\tdensity" > results/abundance_table_species.tsv
-    echo -e "Sample1\\t10.5\\t0.8" >> results/abundance_table_species.tsv
-    echo -e "Sample2\\t15.2\\t1.2" >> results/abundance_table_species.tsv
-    echo -e "Sample3\\t9.8\\t0.5" >> results/abundance_table_species.tsv
+def extension = input_file.name.tokenize('.')
+def is_gzipped = extension[-1]== 'gz'
+def file_type = is_gzipped ? extension[-2]: extension[-1]
 
-    # Generate a plot using a separate Python script
-    python3 - <<END
-    import matplotlib.pyplot as plt
-    import pandas as pd
-    df = pd.read_csv('results/abundance_table_species.tsv', sep='\\t')
-    df.plot(kind='bar', x='sample_ID', y='abundance')
-    plt.savefig('results/abundance_plot.png')
-    END
-
-    # Create a ZIP file with the output files
-    zip -r output.zip results/*
-    """
+if (file_type in ['fastq', 'fasta']) {
+"""
+python analyze_bacteria.py --input $input_file --output analysis_results.html
+"""
+} else {
+error "Unsupported file format: $input_file"
+}
 }
 
 workflow {
-    zipOutput()  // Execute the process
+if (!params.input) {
+error "No input file specified.Use '--input < file>' when running Nextflow."
+    }
+
+    analyze_bacteria()
 }
