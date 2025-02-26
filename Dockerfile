@@ -21,10 +21,23 @@ RUN apt-get update && \
 RUN python3 -m venv /opt/venv && \
     /opt/venv/bin/pip install --upgrade pip
 
-# Install Dash dependencies inside the virtual environment
-RUN /opt/venv/bin/pip install dash dash-bootstrap-components flask
+# Install necessary Python dependencies inside the virtual environment
+RUN /opt/venv/bin/pip install \
+    dash==2.9.3 \
+    dash-bootstrap-components==1.0.3 \
+    dash-core-components==2.0.0 \
+    dash-html-components==2.0.0 \
+    dash-table==5.0.0 \
+    Flask==2.2.2 \
+    Werkzeug==2.2.3 \
+    pandas==1.5.3 \
+    plotly==5.9.0 \
+    numpy==1.24.1 \
+    requests==2.28.2 \
+    gunicorn==21.2.0 \
+    biopython
 
-# Install matplotlib for plotting
+# Install matplotlib for plotting (if needed)
 RUN /opt/venv/bin/pip install matplotlib
 
 # Install Nextflow
