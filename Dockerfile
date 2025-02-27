@@ -48,6 +48,9 @@ RUN curl -fsSL https://get.nextflow.io | bash && \
 # Verify Nextflow installation
 RUN nextflow -version
 
+# Create a symlink to make python accessible as 'python' in the shell
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
 # Set NXF_HOME to a writable directory inside /workspace
 ENV NXF_HOME=/workspace/.nextflow
 
