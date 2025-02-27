@@ -110,22 +110,6 @@ def run_nextflow(n_clicks):
         return f"Unexpected error: {str(e)}"
 
 
-# ----------------- PAGE ROUTING ----------------- #
-pages = {
-    "/bacteria": bacteria_analysis_layout,
-}
-
-app.layout = html.Div([
-    dcc.Location(id="url", refresh=False),
-    html.Div(id="app-container")
-])
-
-
-@app.callback(Output("app-container", "children"), [Input("url", "pathname")])
-def display_page(pathname):
-    return pages.get(pathname, html.H2("Page Not Found"))  # Default error page
-
-
-# ---------------- RUN APP ----------------- #
+# Only modify the following line to avoid starting the Flask server
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    pass  # Do not start the server here in Nextflow environment

@@ -48,6 +48,13 @@ RUN curl -fsSL https://get.nextflow.io | bash && \
 # Verify Nextflow installation
 RUN nextflow -version
 
+# Set NXF_HOME to a writable directory inside /workspace
+ENV NXF_HOME=/workspace/.nextflow
+
+# Create .nextflow directory with proper permissions
+RUN mkdir -p /workspace/.nextflow && \
+    chmod 777 /workspace/.nextflow
+
 # Copy your app and other necessary files into the container
 COPY . /workspace
 

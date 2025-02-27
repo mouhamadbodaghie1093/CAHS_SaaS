@@ -1,36 +1,28 @@
-nextflow.enable.dsl = 2
+nextflow.enable.dsl=2
 
-params.input = ""
-params.output = "results"
 
-process analyze_bacteria {
-tag "$params.input"
-publishDir params.output, mode: 'copy'
+params.input = "/home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/input_data/input_dada.fastq"
 
-input:
-path input_file from file(params.input)  // Correcting how input is passed
+
+process bacteria_analysis {
+    input:
+    path input_file
 
     output:
-path "analysis_results.html"
+    path "analysis_results.html", optional: true  // Allow missing output for debugging
 
     script:
-def extension = input_file.name.tokenize('.')
-def is_gzipped = extension[-1]== 'gz'
-def file_type = is_gzipped ? extension[-2]: extension[-1]
+    """
+    python /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.py --input ${input_file} --output analysis_results.html --no-server
+    """
+}
 
-if (file_type in ['fastq', 'fasta']) {
-"""
-python analyze_bacteria.py --input $input_file --output analysis_results.html
-"""
-} else {
-error "Unsupported file format: $input_file"
-}
-}
+
 
 workflow {
-if (!params.input) {
-error "No input file specified.Use '--input < file>' when running Nextflow."
-    }
+    // Convert input file path to Nextflow channel
+    input_channel = Channel.fromPath(params.input)
 
-    analyze_bacteria()
+    // Run bacteria analysis with input channel
+    bacteria_analysis(input_channel)
 }

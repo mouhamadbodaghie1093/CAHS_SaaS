@@ -87,7 +87,7 @@ bacteria_analysis_layout = dbc.Container([
                 id='upload-data',
                 children=html.Button('Upload Bacteria Data', className="btn btn-primary"),
                 multiple=False,
-                accept='.fastq.gz,.fasta.gz'  # Support for .fastq.gz and .fasta.gz files
+                accept='.fastq.gz,.fasta.gz,.fasta, fastq'  # Support for .fastq.gz and .fasta.gz files
             ),
             html.Div(id='upload-message', className="mt-3"),
         ], width=6)

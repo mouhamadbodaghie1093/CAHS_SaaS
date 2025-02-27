@@ -1,40 +1,40 @@
-Feb-23 22:45:10.891 [main] DEBUG nextflow.cli.Launcher - $> nextflow run bacteria_analysis.nf
-Feb-23 22:45:11.031 [main] DEBUG nextflow.cli.CmdRun - N E X T F L O W  ~  version 24.10.4
-Feb-23 22:45:11.063 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/root/.nextflow/plugins; core-plugins: nf-amazon@2.9.2,nf-azure@1.10.2,nf-cloudcache@0.4.2,nf-codecommit@0.2.2,nf-console@1.1.4,nf-google@1.15.3,nf-tower@1.9.3,nf-wave@1.7.4
-Feb-23 22:45:11.097 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
-Feb-23 22:45:11.098 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
-Feb-23 22:45:11.104 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.12.0 in 'deployment' mode
-Feb-23 22:45:11.124 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
-Feb-23 22:45:11.276 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 from script declaration
-Feb-23 22:45:11.301 [main] DEBUG nextflow.cli.CmdRun - Launching `bacteria_analysis.nf` [curious_caravaggio] DSL2 - revision: cc58914f5f
-Feb-23 22:45:11.304 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
-Feb-23 22:45:11.305 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[]
-Feb-23 22:45:11.409 [main] DEBUG nextflow.Session - Session UUID: 516f34c7-c3cb-48d3-80b4-41d429261e26
-Feb-23 22:45:11.409 [main] DEBUG nextflow.Session - Run name: curious_caravaggio
-Feb-23 22:45:11.410 [main] DEBUG nextflow.Session - Executor pool size: 32
-Feb-23 22:45:11.422 [main] DEBUG nextflow.file.FilePorter - File porter settings maxRetries=3; maxTransfers=50; pollTimeout=null
-Feb-23 22:45:11.432 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=96; workQueue=LinkedBlockingQueue[10000]; allowCoreThreadTimeout=false
-Feb-23 22:45:11.462 [main] DEBUG nextflow.cli.CmdRun - 
+Feb-23 22:53:39.650 [main] DEBUG nextflow.cli.Launcher - $> nextflow run bacteria_analysis.nf
+Feb-23 22:53:39.771 [main] DEBUG nextflow.cli.CmdRun - N E X T F L O W  ~  version 24.10.4
+Feb-23 22:53:39.800 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/root/.nextflow/plugins; core-plugins: nf-amazon@2.9.2,nf-azure@1.10.2,nf-cloudcache@0.4.2,nf-codecommit@0.2.2,nf-console@1.1.4,nf-google@1.15.3,nf-tower@1.9.3,nf-wave@1.7.4
+Feb-23 22:53:39.833 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Feb-23 22:53:39.834 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Feb-23 22:53:39.839 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.12.0 in 'deployment' mode
+Feb-23 22:53:39.855 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Feb-23 22:53:39.989 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 from script declaration
+Feb-23 22:53:40.012 [main] DEBUG nextflow.cli.CmdRun - Launching `bacteria_analysis.nf` [admiring_davinci] DSL2 - revision: cc58914f5f
+Feb-23 22:53:40.015 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Feb-23 22:53:40.015 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[]
+Feb-23 22:53:40.108 [main] DEBUG nextflow.Session - Session UUID: 720fdbf6-0469-4386-b7fb-a20114579cc9
+Feb-23 22:53:40.109 [main] DEBUG nextflow.Session - Run name: admiring_davinci
+Feb-23 22:53:40.110 [main] DEBUG nextflow.Session - Executor pool size: 32
+Feb-23 22:53:40.124 [main] DEBUG nextflow.file.FilePorter - File porter settings maxRetries=3; maxTransfers=50; pollTimeout=null
+Feb-23 22:53:40.135 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=96; workQueue=LinkedBlockingQueue[10000]; allowCoreThreadTimeout=false
+Feb-23 22:53:40.169 [main] DEBUG nextflow.cli.CmdRun - 
   Version: 24.10.4 build 5934
   Created: 20-01-2025 16:47 UTC 
   System: Linux 5.4.0-200-generic
   Runtime: Groovy 4.0.23 on OpenJDK 64-Bit Server VM 17.0.14+7-Ubuntu-120.04
   Encoding: UTF-8 (UTF-8)
-  Process: 2368513@cahsubuntu01 [127.0.1.1]
-  CPUs: 32 - Mem: 251.5 GB (12.7 GB) - Swap: 8 GB (8 GB)
-Feb-23 22:45:11.489 [main] DEBUG nextflow.Session - Work-dir: /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/work [ext2/ext3]
-Feb-23 22:45:11.490 [main] DEBUG nextflow.Session - Script base path does not exist or is not a directory: /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bin
-Feb-23 22:45:11.507 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
-Feb-23 22:45:11.521 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
-Feb-23 22:45:11.558 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
-Feb-23 22:45:11.571 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 33; maxThreads: 1000
-Feb-23 22:45:11.632 [main] DEBUG nextflow.Session - Session start
-Feb-23 22:45:12.431 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
-Feb-23 22:45:12.454 [main] DEBUG n.secret.LocalSecretsProvider - Secrets store: /root/.nextflow/secrets/store.json
-Feb-23 22:45:12.478 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@68b366e2] - activable => nextflow.secret.LocalSecretsProvider@68b366e2
-Feb-23 22:45:12.501 [main] DEBUG nextflow.script.ScriptRunner - Parsed script files:
+  Process: 2369279@cahsubuntu01 [127.0.1.1]
+  CPUs: 32 - Mem: 251.5 GB (12.6 GB) - Swap: 8 GB (8 GB)
+Feb-23 22:53:40.200 [main] DEBUG nextflow.Session - Work-dir: /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/work [ext2/ext3]
+Feb-23 22:53:40.200 [main] DEBUG nextflow.Session - Script base path does not exist or is not a directory: /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bin
+Feb-23 22:53:40.220 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Feb-23 22:53:40.234 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Feb-23 22:53:40.278 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Feb-23 22:53:40.294 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 33; maxThreads: 1000
+Feb-23 22:53:40.361 [main] DEBUG nextflow.Session - Session start
+Feb-23 22:53:41.178 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Feb-23 22:53:41.211 [main] DEBUG n.secret.LocalSecretsProvider - Secrets store: /root/.nextflow/secrets/store.json
+Feb-23 22:53:41.223 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@68b366e2] - activable => nextflow.secret.LocalSecretsProvider@68b366e2
+Feb-23 22:53:41.245 [main] DEBUG nextflow.script.ScriptRunner - Parsed script files:
   Script_68f2d50979709096: /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
-Feb-23 22:45:12.502 [main] DEBUG nextflow.Session - Session aborted -- Cause: =============================================================================
+Feb-23 22:53:41.245 [main] DEBUG nextflow.Session - Session aborted -- Cause: =============================================================================
 =                                WARNING                                    =
 = You are running this script using DSL2 syntax, however it does not        = 
 = contain any 'workflow' definition so there's nothing for Nextflow to run. =
@@ -46,7 +46,7 @@ Feb-23 22:45:12.502 [main] DEBUG nextflow.Session - Session aborted -- Cause: ==
 = More details at this link: https://www.nextflow.io/docs/latest/dsl2.html  =
 =============================================================================
 
-Feb-23 22:45:12.509 [main] DEBUG nextflow.Session - 
+Feb-23 22:53:41.253 [main] DEBUG nextflow.Session - 
 Thread[Finalizer,8,system]
   java.base@17.0.14/java.lang.Object.wait(Native Method)
   java.base@17.0.14/java.lang.ref.ReferenceQueue.remove(ReferenceQueue.java:155)
@@ -133,7 +133,7 @@ Thread[AnsiLogObserver,5,main]
   app//groovy.lang.Closure.run(Closure.java:505)
   java.base@17.0.14/java.lang.Thread.run(Thread.java:840)
 
-Feb-23 22:45:12.521 [main] DEBUG nextflow.cli.Launcher - Operation aborted
+Feb-23 22:53:41.265 [main] DEBUG nextflow.cli.Launcher - Operation aborted
 nextflow.exception.AbortOperationException: =============================================================================
 =                                WARNING                                    =
 = You are running this script using DSL2 syntax, however it does not        = 
