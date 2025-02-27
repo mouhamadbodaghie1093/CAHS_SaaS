@@ -51,6 +51,8 @@ bacteria_analysis_layout = dbc.Container([
     dbc.Button("Back to Menu", href="/menu", color="secondary", className="d-block mx-auto mt-4"),
 ], fluid=True)
 
+# Assign layout to the Dash app
+app.layout = bacteria_analysis_layout
 
 # ----------------- CALLBACKS ----------------- #
 @app.callback(

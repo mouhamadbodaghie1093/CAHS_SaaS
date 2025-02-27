@@ -6,6 +6,7 @@ import subprocess
 
 import dash
 import dash_bootstrap_components as dbc
+import numpy as np
 from Bio import SeqIO
 from dash import html, dcc
 from dash.dependencies import Input, Output, State
@@ -96,7 +97,7 @@ bacteria_analysis_layout = dbc.Container([
     # Data Visualization
     dbc.Row([
         dbc.Col(dcc.Graph(id='abundance-plot'), width=6),
-        dbc.Col(dcc.Graph(id='density-plot'), width=6),
+        dbc.Col(dcc.Graph(id='shannon-plot'), width=6),
     ], className="mt-4"),
 
     # Run Nextflow Pipeline
@@ -203,17 +204,19 @@ def handle_file_upload(contents, filename):
 # Run Nextflow Pipeline
 @app.callback(
     [Output("nextflow-status", "children"),
-     Output("download-zip", "data")],
+     Output("download-zip", "data"),
+     Output("abundance-plot", "figure"),
+     Output("shannon-plot", "figure")],
     [Input("run-nextflow", "n_clicks")]
 )
 def run_nextflow(n_clicks):
     if not n_clicks:
-        return "", dash.no_update
+        return "", dash.no_update, dash.no_update, dash.no_update
 
     script_path = os.path.abspath("bacteria_analysis.nf")
 
     if not os.path.exists(script_path):
-        return f"Error: Nextflow script not found at {script_path}.", dash.no_update
+        return f"Error: Nextflow script not found at {script_path}.", dash.no_update, dash.no_update, dash.no_update
 
     try:
         # Ensure results directory exists
@@ -230,19 +233,49 @@ def run_nextflow(n_clicks):
 
         # Capture both stdout and stderr for logging
         if result.returncode != 0:
-            return f"Error running Nextflow:\n{result.stderr}\n{result.stdout}", dash.no_update
+            return f"Error running Nextflow:\n{result.stderr}\n{result.stdout}", dash.no_update, dash.no_update, dash.no_update
 
         # Path to the output ZIP file
         zip_file_path = os.path.join(results_dir, "output.zip")
 
         if not os.path.exists(zip_file_path):
-            return f"Error: Nextflow finished, but no output file found at {zip_file_path}.", dash.no_update
+            return f"Error: Nextflow finished, but no output file found at {zip_file_path}.", dash.no_update, dash.no_update, dash.no_update
+
+        # Calculate Abundance and Shannon index
+        abundance_data = np.random.rand(10)  # Placeholder for actual abundance data
+        shannon_index_data = np.random.rand(10)  # Placeholder for actual Shannon index data
+
+        # Generate abundance plot
+        fig_abundance = {
+            'data': [{
+                'x': [f"Genus {i}" for i in range(1, 11)],
+                'y': abundance_data,
+                'type': 'bar',
+                'name': 'Abundance'
+            }],
+            'layout': {
+                'title': 'Relative Abundance of Bacterial Genera'
+            }
+        }
+
+        # Generate Shannon Index plot
+        fig_shannon = {
+            'data': [{
+                'x': [f"Sample {i}" for i in range(1, 11)],
+                'y': shannon_index_data,
+                'type': 'line',
+                'name': 'Shannon Index'
+            }],
+            'layout': {
+                'title': 'Shannon Index Diversity'
+            }
+        }
 
         # Return status message and trigger download of the ZIP file
-        return "Nextflow completed successfully!", dcc.send_file(zip_file_path)
+        return "Nextflow completed successfully!", dcc.send_file(zip_file_path), fig_abundance, fig_shannon
 
     except Exception as e:
-        return f"Unexpected error: {str(e)}", dash.no_update
+        return f"Unexpected error: {str(e)}", dash.no_update, dash.no_update, dash.no_update
 
 
 # ----------------- HEALTH CHECK ROUTE ----------------- #
