@@ -73,3 +73,8 @@
 2025-02-27 03:22:00	3.2s	stoic_bose	OK	5b308d2bb7607f513fa06b1916e50de7	d25290b1-9bfd-44dd-be06-248ecde41ca5	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
 2025-02-27 03:28:30	4.1s	angry_goldwasser	OK	5b308d2bb7607f513fa06b1916e50de7	2c6f6f62-7baf-470a-a9e8-a2af9ba5cdc8	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
 2025-02-27 03:30:48	3s	ridiculous_watson	OK	5b308d2bb7607f513fa06b1916e50de7	fce52536-bb34-4bf9-99ac-2561d3407868	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
+2025-02-27 03:41:09	3.2s	ecstatic_hodgkin	OK	5b308d2bb7607f513fa06b1916e50de7	7e3e7520-4cc1-4ad1-a4ef-038db5825008	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
+2025-02-27 03:47:25	2.1s	distraught_mccarthy	ERR	5b308d2bb7607f513fa06b1916e50de7	3651a206-cd4c-4871-81bc-d937b05a6cc7	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
+2025-02-27 03:48:21	3.7s	desperate_allen	OK	5b308d2bb7607f513fa06b1916e50de7	019aa88e-c920-440f-b25a-3936984c48e4	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
+2025-02-27 03:51:30	3.4s	golden_shockley	OK	5b308d2bb7607f513fa06b1916e50de7	aa8f1571-c251-4faa-b293-0aace491ab95	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
+2025-02-28 19:01:34	3s	pedantic_fourier	OK	5b308d2bb7607f513fa06b1916e50de7	256a5594-1900-4007-b652-0d6e588f08d8	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
