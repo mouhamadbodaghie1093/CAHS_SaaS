@@ -8,14 +8,13 @@ process bacteria_analysis {
     path input_file
 
     output:
-    path "analysis_results.html", optional: true  // Allow missing output for debugging
+    path "analysis_results.html"
 
     script:
     """
-    python /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.py --input ${input_file} --output analysis_results.html --no-server
+    python /correct/path/to/bacteria_analysis.py --input ${input_file} --output analysis_results.html --no-server
     """
 }
-
 workflow {
     // Convert input file path to Nextflow channel
     input_channel = Channel.fromPath(params.input)
