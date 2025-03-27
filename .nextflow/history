@@ -78,3 +78,7 @@
 2025-02-27 03:48:21	3.7s	desperate_allen	OK	5b308d2bb7607f513fa06b1916e50de7	019aa88e-c920-440f-b25a-3936984c48e4	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
 2025-02-27 03:51:30	3.4s	golden_shockley	OK	5b308d2bb7607f513fa06b1916e50de7	aa8f1571-c251-4faa-b293-0aace491ab95	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
 2025-02-28 19:01:34	3s	pedantic_fourier	OK	5b308d2bb7607f513fa06b1916e50de7	256a5594-1900-4007-b652-0d6e588f08d8	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
+2025-03-25 20:22:04	6.6s	chaotic_dubinsky	ERR	bb9a42ff325ec9b13ee4e1163fda2730	68a001e9-e50c-441d-966a-7c145539e8ff	nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/bacteria_analysis.nf
+2025-03-26 16:25:52	3.4s	suspicious_linnaeus	ERR	bb9a42ff325ec9b13ee4e1163fda2730	27782bd2-1157-4c43-adfd-4825e728ca72	nextflow run bacteria_analysis.nf --input your_input_file
+2025-03-26 16:27:56	3s	condescending_gautier	ERR	bb9a42ff325ec9b13ee4e1163fda2730	7f6465be-3dc7-4d45-82d3-f393dc59d2c1	nextflow run bacteria_analysis.nf --input input_dada.fastq
+2025-03-26 16:37:19	2.3s	determined_pare	ERR	bb9a42ff325ec9b13ee4e1163fda2730	bff2b1e5-40f8-4d8c-a49e-9699766de8a7	nextflow run bacteria_analysis.nf --input input_dada.fastq

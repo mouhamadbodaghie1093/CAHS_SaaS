@@ -1,7 +1,6 @@
 import base64
 import gzip
 import io
-import os
 import subprocess
 
 import dash
@@ -116,9 +115,49 @@ bacteria_analysis_layout = dbc.Container([
 
 # ----------------- SNP ANALYSIS PAGE ----------------- #
 snp_analysis_layout = dbc.Container([
-    html.H1("SNP Analysis Page", className="text-center mt-5"),
-    dbc.Button("Back to Menu", href="/menu", color="secondary", className="d-block mx-auto mt-3"),
-])
+    html.H1("SNP Analysis", className="text-center mt-5"),
+
+    # File Upload Section
+    dbc.Row([
+        dbc.Col([
+            dcc.Upload(
+                id='upload-snp-data',
+                children=html.Button('Upload FASTQ/BAM', className="btn btn-primary"),
+                multiple=False,
+                accept='.fastq,.bam'
+            ),
+            html.Div(id='upload-snp-message', className="mt-3"),
+        ], width=6)
+    ], className="justify-content-center mt-4"),
+
+    # SNP Analysis Execution
+    dbc.Row([
+        dbc.Col([
+            dbc.Button("Run SNP Analysis", id="run-snp-analysis", color="success", className="d-block mx-auto mt-3"),
+            html.Div(id="snp-analysis-status", className="text-center mt-3")
+        ], width=4)
+    ], className="justify-content-center mt-4"),
+
+    # Back Button
+    dbc.Button("Back to Menu", href="/menu", color="secondary", className="d-block mx-auto mt-4"),
+], fluid=True)
+
+
+@app.callback(
+    Output("upload-snp-message", "children"),
+    [Input("upload-snp-data", "contents")],
+    [State("upload-snp-data", "filename")]
+)
+def handle_snp_file_upload(contents, filename):
+    if contents is None:
+        return "Please upload a valid FASTQ or BAM file."
+
+    file_extension = filename.split('.')[-1].lower()
+    if file_extension not in ['fastq', 'bam']:
+        return "Unsupported file format. Please upload FASTQ or BAM."
+
+    return f"File {filename} uploaded successfully."
+
 
 # ----------------- PAGE ROUTING ----------------- #
 pages = {
@@ -213,78 +252,47 @@ def run_nextflow(n_clicks):
     if not n_clicks:
         return "", dash.no_update, dash.no_update, dash.no_update
 
-    script_path = os.path.abspath("bacteria_analysis.nf")
+    try:
+        # Example nextflow command (adjust to your specific use case)
+        command = ["nextflow", "run", "bacteria_analysis.nf", "--input", "input_dada.fastq"]
+        subprocess.run(command, check=True)
 
-    if not os.path.exists(script_path):
-        return f"Error: Nextflow script not found at {script_path}.", dash.no_update, dash.no_update, dash.no_update
+        # Generate plots (placeholder)
+        abundance_plot = {
+            "data": [{"x": np.arange(10), "y": np.random.random(10), "type": "bar"}],
+            "layout": {"title": "Abundance Plot"}
+        }
+
+        shannon_plot = {
+            "data": [{"x": np.arange(10), "y": np.random.random(10), "type": "line"}],
+            "layout": {"title": "Shannon Index Plot"}
+        }
+
+        # Generate zip file for download (placeholder path)
+        zip_data = "path_to_your_zip_file.zip"
+
+        return "Nextflow analysis complete.", dcc.send_file(zip_data), abundance_plot, shannon_plot
+
+    except subprocess.CalledProcessError as e:
+        return f"Nextflow pipeline failed: {str(e)}", dash.no_update, dash.no_update, dash.no_update
+
+
+@app.callback(
+    Output("snp-analysis-status", "children"),
+    [Input("run-snp-analysis", "n_clicks")]
+)
+def run_snp_analysis(n_clicks):
+    if not n_clicks:
+        return ""
 
     try:
-        # Ensure results directory exists
-        results_dir = os.path.join(os.getcwd(), "results")
-        if not os.path.exists(results_dir):
-            os.makedirs(results_dir)
+        command = ["nextflow", "run", "snp_analysis.nf", "--input", "uploaded_snp_file.fastq"]
+        subprocess.run(command, check=True)
 
-        # Run Nextflow pipeline
-        result = subprocess.run(
-            ["nextflow", "run", script_path],
-            capture_output=True,
-            text=True
-        )
+        return "SNP Analysis complete."
 
-        # Capture both stdout and stderr for logging
-        if result.returncode != 0:
-            return f"Error running Nextflow:\n{result.stderr}\n{result.stdout}", dash.no_update, dash.no_update, dash.no_update
-
-        # Path to the output ZIP file
-        zip_file_path = os.path.join(results_dir, "output.zip")
-
-        if not os.path.exists(zip_file_path):
-            return f"Error: Nextflow finished, but no output file found at {zip_file_path}.", dash.no_update, dash.no_update, dash.no_update
-
-        # Calculate Abundance and Shannon index
-        abundance_data = np.random.rand(10)  # Placeholder for actual abundance data
-        shannon_index_data = np.random.rand(10)  # Placeholder for actual Shannon index data
-
-        # Generate abundance plot
-        fig_abundance = {
-            'data': [{
-                'x': [f"Genus {i}" for i in range(1, 11)],
-                'y': abundance_data,
-                'type': 'bar',
-                'name': 'Abundance'
-            }],
-            'layout': {
-                'title': 'Relative Abundance of Bacterial Genera'
-            }
-        }
-
-        # Generate Shannon Index plot
-        fig_shannon = {
-            'data': [{
-                'x': [f"Sample {i}" for i in range(1, 11)],
-                'y': shannon_index_data,
-                'type': 'line',
-                'name': 'Shannon Index'
-            }],
-            'layout': {
-                'title': 'Shannon Index Diversity'
-            }
-        }
-
-        # Return status message and trigger download of the ZIP file
-        return "Nextflow completed successfully!", dcc.send_file(zip_file_path), fig_abundance, fig_shannon
-
-    except Exception as e:
-        return f"Unexpected error: {str(e)}", dash.no_update, dash.no_update, dash.no_update
-
-
-# ----------------- HEALTH CHECK ROUTE ----------------- #
-@server.route('/health')
-def health_check():
-    return "OK", 200
-
-
-# ---------------- RUN APP ---------------- #
+    except subprocess.CalledProcessError as e:
+        return f"SNP pipeline failed: {str(e)}"
 
 if __name__ == "__main__":
     app.run_server(debug=True)

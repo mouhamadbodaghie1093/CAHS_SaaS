@@ -1,4 +1,4 @@
-# Use Debian Bookworm as base image
+`# Use Debian Bookworm as base image
 FROM debian:bookworm-slim
 
 WORKDIR /workspace
@@ -70,3 +70,4 @@ EXPOSE 8050
 
 # Define the command to start the Dash application
 CMD ["/opt/venv/bin/python3", "app.py"]
+`
