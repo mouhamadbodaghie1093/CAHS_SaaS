@@ -14,12 +14,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-venv \
     build-essential \
     openjdk-17-jre \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Ensure Python is accessible as 'python'
+RUN ln -s /usr/bin/python3 /usr/bin/python || true
+
+# Copy requirements.txt before installing dependencies
+COPY requirements.txt /workspace/requirements.txt
 
 # Create and activate virtual environment, install pip dependencies
 RUN python3 -m venv /opt/venv && \
     /opt/venv/bin/pip install --upgrade pip && \
-    /opt/venv/bin/pip install -r requirements.txt
+    /opt/venv/bin/pip install -r /workspace/requirements.txt
 
 # Install Nextflow
 RUN curl -fsSL https://get.nextflow.io | bash && \
@@ -27,14 +33,11 @@ RUN curl -fsSL https://get.nextflow.io | bash && \
     chmod +x /usr/local/bin/nextflow && \
     nextflow -version
 
-# Ensure Python is accessible as 'python'
-RUN ln -s /usr/bin/python3 /usr/bin/python
-
 # Set Nextflow home to a writable directory inside /workspace
 ENV NXF_HOME=/workspace/.nextflow
 
 # Create .nextflow directory with proper permissions
-RUN mkdir -p /workspace/.nextflow && chmod 775 /workspace/.nextflow
+RUN mkdir -p "$NXF_HOME" && chmod 775 "$NXF_HOME"
 
 # Copy application files into the container
 COPY . /workspace
@@ -47,4 +50,4 @@ ENV FLASK_RUN_HOST=0.0.0.0
 EXPOSE 8050
 
 # Define the command to start the Dash application
-CMD ["/opt/venv/bin/python3", "app.py"]
+CMD ["/opt/venv/bin/python", "app.py"]
