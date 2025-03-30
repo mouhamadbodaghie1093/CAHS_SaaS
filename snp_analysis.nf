@@ -1,20 +1,17 @@
-#!/usr/bin/env nextflow
-
-params.input = file(params.input ?: 'input.fastq')
-params.bam = file(params.bam ?: 'input.bam')
-
-process SNP_Analysis {
+process SNPAnalysis {
     input:
-    path fastq_file from params.input
-    path bam_file from params.bam
+    tuple val(sample_id), path(fastq_files)
 
     output:
-    path "snp_results.vcf"
+    path("results/${sample_id}_snp_results.vcf")
 
     script:
     """
-    echo "Running SNP analysis on FASTQ: $fastq_file and BAM: $bam_file"
-    bcftools mpileup -Ou -f reference.fasta $bam_file | bcftools call -mv -Oz -o snp_results.vcf.gz
-    bcftools index snp_results.vcf.gz
+    snp_tool --input ${fastq_files} --output results/${sample_id}_snp_results.vcf
     """
+}
+
+workflow SNPWorkflow {
+    samples_ch = Channel.fromPath("data/*.fastq").map { file -> tuple(file.baseName.replace('.fastq', ''), file) }
+    SNPAnalysis(samples_ch)
 }

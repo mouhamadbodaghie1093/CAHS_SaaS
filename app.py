@@ -1,6 +1,7 @@
 import base64
 import gzip
 import io
+import os
 import subprocess
 
 import dash
@@ -13,9 +14,14 @@ from flask import Flask
 
 # Create a Flask server instance
 server = Flask(__name__)
-
+UPLOAD_FOLDER = "/tmp/uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # Initialize Dash app with Bootstrap theme
 app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
+app.layout = html.Div([
+    html.Button("Download VCF", id="download-button"),
+    dcc.Download(id="download-link")
+])
 
 # ---------------- LOGIN PAGE ---------------- #
 login_layout = dbc.Container([
@@ -87,7 +93,7 @@ bacteria_analysis_layout = dbc.Container([
                 id='upload-data',
                 children=html.Button('Upload Bacteria Data', className="btn btn-primary"),
                 multiple=False,
-                accept='.fastq.gz,.fasta.gz,.fasta, fastq'  # Support for .fastq.gz and .fasta.gz files
+                accept='.fastq.gz,.fasta.gz,.fasta, fastq,.fna'  # Support for .fastq.gz and .fasta.gz files
             ),
             html.Div(id='upload-message', className="mt-3"),
         ], width=6)
@@ -117,16 +123,29 @@ bacteria_analysis_layout = dbc.Container([
 snp_analysis_layout = dbc.Container([
     html.H1("SNP Analysis", className="text-center mt-5"),
 
-    # File Upload Section
+    # File Upload Section for FASTQ Files
     dbc.Row([
         dbc.Col([
             dcc.Upload(
-                id='upload-snp-data',
-                children=html.Button('Upload FASTQ/BAM', className="btn btn-primary"),
+                id='upload-fastq-data',
+                children=html.Button('Upload FASTQ File', className="btn btn-primary"),
                 multiple=False,
-                accept='.fastq,.bam'
+                accept='.fastq,.fastq.gz,.fna'
             ),
-            html.Div(id='upload-snp-message', className="mt-3"),
+            html.Div(id='upload-fastq-message', className="mt-3"),
+        ], width=6)
+    ], className="justify-content-center mt-4"),
+
+    # File Upload Section for BAM Files
+    dbc.Row([
+        dbc.Col([
+            dcc.Upload(
+                id='upload-bam-data',
+                children=html.Button('Upload BAM File', className="btn btn-primary"),
+                multiple=False,
+                accept='.bam'
+            ),
+            html.Div(id='upload-bam-message', className="mt-3"),
         ], width=6)
     ], className="justify-content-center mt-4"),
 
@@ -138,25 +157,50 @@ snp_analysis_layout = dbc.Container([
         ], width=4)
     ], className="justify-content-center mt-4"),
 
+    # Add Download VCF Button
+    dbc.Row([
+        dbc.Col([
+            dbc.Button("Download VCF", id="download-vcf-button", color="info", className="d-block mx-auto mt-3"),
+            dcc.Download(id="download-vcf")
+        ], width=4)
+    ], className="justify-content-center mt-4"),
+
     # Back Button
     dbc.Button("Back to Menu", href="/menu", color="secondary", className="d-block mx-auto mt-4"),
 ], fluid=True)
 
 
+
 @app.callback(
-    Output("upload-snp-message", "children"),
-    [Input("upload-snp-data", "contents")],
-    [State("upload-snp-data", "filename")]
+    [Output("upload-fastq-message", "children"),
+     Output("upload-bam-message", "children"),
+     Output("run-snp-analysis", "data")],
+    [Input("upload-fastq-data", "contents"), Input("upload-bam-data", "contents")],
+    [State("upload-fastq-data", "filename"), State("upload-bam-data", "filename")]
 )
-def handle_snp_file_upload(contents, filename):
+def handle_snp_file_upload(fastq_contents, bam_contents, fastq_filename, bam_filename):
+    fastq_msg, fastq_file_path = save_uploaded_file(fastq_contents, fastq_filename) if fastq_contents else (None, None)
+    bam_msg, bam_file_path = save_uploaded_file(bam_contents, bam_filename) if bam_contents else (None, None)
+
+    # Only proceed with SNP analysis if both files are uploaded
+    if fastq_file_path and bam_file_path:
+        return fastq_msg, bam_msg, (fastq_file_path, bam_file_path)
+
+    return fastq_msg or bam_msg, dash.no_update, dash.no_update
+
+
+def save_uploaded_file(contents, filename):
     if contents is None:
-        return "Please upload a valid FASTQ or BAM file."
+        return "No file uploaded."
 
-    file_extension = filename.split('.')[-1].lower()
-    if file_extension not in ['fastq', 'bam']:
-        return "Unsupported file format. Please upload FASTQ or BAM."
+    data = contents.split(",")[1]
+    decoded = base64.b64decode(data)
 
-    return f"File {filename} uploaded successfully."
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
+    with open(file_path, "wb") as f:
+        f.write(decoded)
+
+    return f"File saved at {file_path}", file_path
 
 
 # ----------------- PAGE ROUTING ----------------- #
@@ -279,20 +323,30 @@ def run_nextflow(n_clicks):
 
 @app.callback(
     Output("snp-analysis-status", "children"),
-    [Input("run-snp-analysis", "n_clicks")]
+    [Input("run-snp-analysis", "n_clicks")],
+    [State("run-snp-analysis", "data")]
 )
-def run_snp_analysis(n_clicks):
-    if not n_clicks:
-        return ""
+def run_snp_analysis(n_clicks, file_paths):
+    if not n_clicks or not file_paths:
+        return "Please upload both FASTQ and BAM files first."
 
     try:
-        command = ["nextflow", "run", "snp_analysis.nf", "--input", "uploaded_snp_file.fastq"]
+        fastq_path, bam_path = file_paths
+        command = ["nextflow", "run", "snp_analysis.nf", "--fna", fastq_path, "--bam", bam_path]
         subprocess.run(command, check=True)
-
         return "SNP Analysis complete."
-
     except subprocess.CalledProcessError as e:
         return f"SNP pipeline failed: {str(e)}"
+
+    @app.callback(
+        Output("download-vcf", "data"),
+        Input("download-vcf-button", "n_clicks"),
+        prevent_initial_call=True
+    )
+    def download_vcf(n_clicks):
+        vcf_path = "/path/to/your/output.vcf"  # Ensure this file exists
+        return dcc.send_file(vcf_path)
+
 
 if __name__ == "__main__":
     app.run_server(debug=True)

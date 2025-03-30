@@ -1,24 +1,19 @@
 nextflow.enable.dsl=2
 
-params.input = "/home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/input_data/input_dada.fastq"
-params.output = "analysis_results.html"  // Default output file
-
-process bacteria_analysis {
+process BacteriaAnalysis {
     input:
-    path input_file
+    tuple val(sample_id), path(fastq_files)
 
     output:
-    path "analysis_results.html"
+    path("${sample_id}_bacteria_results.txt")
 
     script:
     """
-    python /correct/path/to/bacteria_analysis.py --input ${input_file} --output analysis_results.html --no-server
+    bacteria_tool --input ${fastq_files} --output ${sample_id}_bacteria_results.txt
     """
 }
-workflow {
-    // Convert input file path to Nextflow channel
-    input_channel = Channel.fromPath(params.input)
 
-    // Run bacteria analysis with input channel
-    bacteria_analysis(input_channel)
+workflow {
+    samples_ch = Channel.fromPath("data/*.fastq").map { file -> tuple(file.baseName, file) }
+    BacteriaAnalysis(samples_ch)
 }
