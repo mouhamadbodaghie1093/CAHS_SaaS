@@ -14,6 +14,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-venv \
     build-essential \
     openjdk-17-jre \
+    libbz2-dev \
+    liblzma-dev \
+    zlib1g-dev \
+    libsqlite3-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Ensure Python is accessible as 'python'
@@ -25,7 +29,7 @@ COPY requirements.txt /workspace/requirements.txt
 # Create and activate virtual environment, install pip dependencies
 RUN python3 -m venv /opt/venv && \
     /opt/venv/bin/pip install --upgrade pip && \
-    /opt/venv/bin/pip install -r /workspace/requirements.txt
+    /opt/venv/bin/pip install --no-cache-dir -r /workspace/requirements.txt
 
 # Install Nextflow
 RUN curl -fsSL https://get.nextflow.io | bash && \
