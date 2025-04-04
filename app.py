@@ -13,8 +13,9 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_
 
 # Define the paths for uploaded files
 UPLOAD_DIR = "/tmp"
-FNA_FILE_PATH = os.path.join(UPLOAD_DIR, "uploaded_fna.fna")
-BAM_FILE_PATH = os.path.join(UPLOAD_DIR, "uploaded_bam.bam")
+FNA_FILE_PATH = os.path.join(UPLOAD_DIR, "uploaded_file.fna")
+BAM_FILE_PATH = os.path.join(UPLOAD_DIR, "uploaded_file.bam")
+REFERENCE_FILE_PATH = "/path/to/your/reference/file.fasta"
 VCF_FILE_PATH = os.path.join(UPLOAD_DIR, "snp_analysis_results.vcf")
 
 # ---------------- LOGIN PAGE ---------------- #
@@ -147,7 +148,7 @@ def run_snp_analysis(n_clicks):
         return "Please upload both files before running analysis.", False, dash.no_update
 
     # Run Nextflow
-    nextflow_cmd = f"nextflow run /workspace/snp_analysis.nf --fna /workspace/{FNA_FILE_PATH} --bam /workspace/{BAM_FILE_PATH}"
+    nextflow_cmd = f"nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/snp_analysis.nf --fna {FNA_FILE_PATH} --bam {BAM_FILE_PATH}"
 
     try:
         # Run the Nextflow command and capture output
@@ -185,4 +186,4 @@ app.layout = html.Div([
 
 # Run the app
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=80)
+    app.run_server(debug=True, host='0.0.0.0', port=8060)

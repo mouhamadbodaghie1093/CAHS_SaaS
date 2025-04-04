@@ -1,8 +1,8 @@
 nextflow.enable.dsl=2
 
-params.fna = '/workspace/uploaded_fna.fna'
-params.bam = '/workspace/uploaded_bam.bam'
-params.reference = '/workspace/ref.fna'
+params.fna = '/home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/uploaded_fna.fna'
+params.bam = '/home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/uploaded_bam.bam'
+params.reference = '/home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/test/ref.fna'
 
 process snp_calling {
     input:
