@@ -4,7 +4,6 @@ params.fna = '/workspace/uploaded_fna.fna'
 params.bam = '/workspace/uploaded_bam.bam'
 params.reference = '/workspace/ref.fna'
 
-
 process snp_calling {
     input:
     path fna
@@ -16,6 +15,7 @@ process snp_calling {
 
     script:
     """
+    # Create the results directory if it doesn't exist
     mkdir -p ./results
 
     # Ensure the reference genome is indexed

@@ -147,7 +147,7 @@ def run_snp_analysis(n_clicks):
         return "Please upload both files before running analysis.", False, dash.no_update
 
     # Run Nextflow
-    nextflow_cmd = f"nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/snp_analysis.nf --fna {FNA_FILE_PATH} --bam {BAM_FILE_PATH}"
+    nextflow_cmd = f"nextflow run /workspace/snp_analysis.nf --fna /workspace/{FNA_FILE_PATH} --bam /workspace/{BAM_FILE_PATH}"
 
     try:
         # Run the Nextflow command and capture output

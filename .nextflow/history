@@ -167,3 +167,20 @@
 2025-04-04 02:04:24	4.5s	chaotic_gates	ERR	772c5872a8654886765c1f01edcbcbb2	bae1f5e6-ca6d-4bd9-9b02-ca155fc5d3b4	nextflow run /workspace/snp_analysis.nf
 2025-04-04 02:06:53	3.9s	pensive_lamarck	ERR	772c5872a8654886765c1f01edcbcbb2	8fe2ad0f-8850-4ec7-a4ec-367225b04387	nextflow run /workspace/snp_analysis.nf
 2025-04-04 02:09:34	5.2s	friendly_shirley	ERR	772c5872a8654886765c1f01edcbcbb2	8052ce04-f482-40c3-9e18-54bfaf46c047	nextflow run /workspace/snp_analysis.nf
+2025-04-04 02:52:27	3.7s	silly_meninsky	ERR	772c5872a8654886765c1f01edcbcbb2	da79820e-72ee-4bf6-a821-40ca6dbad594	nextflow run /workspace/snp_analysis.nf --fna /workspace/your.fna --bam /workspace/your.bam
+2025-04-04 02:53:54	3.1s	cheeky_keller	ERR	772c5872a8654886765c1f01edcbcbb2	68fe6d74-74ec-4b77-8744-8dabb6bae2cb	nextflow run /workspace/snp_analysis.nf --fna /workspace/test/ref.fna --bam /workspace/test/sample.bam
+2025-04-04 02:55:42	5.1s	cranky_swirles	ERR	772c5872a8654886765c1f01edcbcbb2	20e063d0-240e-45eb-9da8-fd582d4877cd	nextflow run /workspace/snp_analysis.nf --fna /workspace/uploaded_file.fna --bam /workspace/uploaded_file.bam
+2025-04-04 02:58:17	5s	boring_knuth	ERR	772c5872a8654886765c1f01edcbcbb2	b3400e23-974b-44d2-be6d-d247ca35d9f7	nextflow run /workspace/snp_analysis.nf --fna /workspace/uploaded_file.fna --bam /workspace/uploaded_file.bam
+2025-04-04 03:00:52	6.3s	chaotic_elion	ERR	2926f07715e14c47cbc3ba6ac45d4d1f	e20410d4-8d33-45c7-ade4-5437da23452f	nextflow run /workspace/snp_analysis.nf
+2025-04-04 03:02:37	4.8s	exotic_knuth	ERR	2926f07715e14c47cbc3ba6ac45d4d1f	e33cb1bb-df4d-4f5e-b65f-7f6892dd22a3	nextflow run /workspace/snp_analysis.nf
+2025-04-04 03:04:03	5.8s	voluminous_pike	ERR	2926f07715e14c47cbc3ba6ac45d4d1f	0688945b-847d-48c5-802c-e603abbe5525	nextflow run /workspace/snp_analysis.nf
+2025-04-04 03:04:35	5.1s	drunk_turing	ERR	772c5872a8654886765c1f01edcbcbb2	fa6d9564-e211-4aa9-b5e4-9931a584eb12	nextflow run /workspace/snp_analysis.nf
+2025-04-04 03:06:05	3.5s	agitated_agnesi	ERR	772c5872a8654886765c1f01edcbcbb2	ad3a3448-e376-4650-ae33-cb4c6e00d80a	nextflow run /workspace/snp_analysis.nf
+2025-04-04 03:07:29	4.4s	cranky_venter	ERR	772c5872a8654886765c1f01edcbcbb2	fa9bfaf9-83ba-4685-a791-648ce2f9f0d9	nextflow run /workspace/snp_analysis.nf
+2025-04-04 03:09:21	5.4s	lonely_shirley	ERR	772c5872a8654886765c1f01edcbcbb2	12b0baf2-f093-44b4-8f72-8fe5d7faa172	nextflow run /workspace/snp_analysis.nf
+2025-04-04 03:11:00	5.5s	compassionate_miescher	ERR	772c5872a8654886765c1f01edcbcbb2	68b62eb5-0d48-4cac-a4b5-d63c4fa9f4fd	nextflow run /workspace/snp_analysis.nf
+2025-04-04 03:12:46	5.3s	nostalgic_sinoussi	ERR	772c5872a8654886765c1f01edcbcbb2	0688185f-f04d-4861-813b-a8763b041b5d	nextflow run /workspace/snp_analysis.nf --fna /workspace/uploaded_fna.fna --bam /workspace/uploaded_bam.bam --reference /workspace/ref.fna
+2025-04-04 03:14:31	4.1s	nice_celsius	ERR	b25d766454bb6ead7cee8e70e44ae432	8b2b9ee8-5d63-43f9-af08-90f193bfa889	nextflow run /workspace/snp_analysis.nf --fna /workspace/uploaded_fna.fna --bam /workspace/uploaded_bam.bam --reference /workspace/ref.fna
+2025-04-04 03:15:25	5.7s	desperate_austin	ERR	a7b7e1ec10de159c43f8ac4550d686c2	b9a0bdde-f614-4482-8c7f-86bb8c8c5c44	nextflow run /workspace/snp_analysis.nf --fna /workspace/uploaded_fna.fna --bam /workspace/uploaded_bam.bam --reference /workspace/ref.fna
+2025-04-04 03:16:39	4.7s	mighty_bose	ERR	a7b7e1ec10de159c43f8ac4550d686c2	7b698c04-9f41-45f6-8a17-7f02367df4a0	nextflow run /workspace/snp_analysis.nf --fna /workspace/uploaded_fna.fna --bam /workspace/uploaded_bam.bam --reference /workspace/ref.fna
+2025-04-04 03:19:12	4.5s	mad_goldberg	OK	a7b7e1ec10de159c43f8ac4550d686c2	46eabf8e-6165-4192-971e-30778a4d4d6d	nextflow run /workspace/snp_analysis.nf --fna /workspace/uploaded_file.fna --bam /workspace/uploaded_file.bam --reference /workspace/ref.fna
