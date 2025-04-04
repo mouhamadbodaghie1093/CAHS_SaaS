@@ -1,9 +1,10 @@
 services:
   - type: web
-    name: your-app-name
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn -w 1 -k gthread -b 0.0.0.0:$PORT app:server
+    name: my-dash-app
+    env: docker
+    dockerfilePath: ./Dockerfile
+    buildCommand: ""  # No build command needed since you're using Docker
+    startCommand: "/opt/venv/bin/python app.py"  # Start the app using the appropriate python path
     envVars:
-      - key: PORT
-        value: "1000"
+      - key: FLASK_ENV
+        value: production

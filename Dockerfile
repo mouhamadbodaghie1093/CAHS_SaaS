@@ -18,6 +18,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     liblzma-dev \
     zlib1g-dev \
     libsqlite3-dev \
+    samtools \
+    bcftools \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Ensure Python is accessible as 'python'
@@ -51,7 +53,7 @@ ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
 
 # Expose necessary port
-EXPOSE 8050
+EXPOSE 80
 
 # Define the command to start the Dash application
 CMD ["/opt/venv/bin/python", "app.py"]
