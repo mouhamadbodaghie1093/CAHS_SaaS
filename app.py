@@ -149,25 +149,41 @@ def run_snp_analysis(n_clicks):
     if not os.path.exists(FNA_FILE_PATH) or not os.path.exists(BAM_FILE_PATH):
         return "Please upload both files before running analysis.", False, dash.no_update
 
-    nextflow_cmd = f"nextflow run {SNP_SCRIPT_PATH} --fna {FNA_FILE_PATH} --bam {BAM_FILE_PATH}"
+    # Run Nextflow
+    nextflow_cmd = f"nextflow run snp_analysis.nf --fna {FNA_FILE_PATH} --bam {BAM_FILE_PATH}"
 
     try:
-        result = subprocess.run(nextflow_cmd, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print("STDOUT:", result.stdout.decode())
-        print("STDERR:", result.stderr.decode())
+        result = subprocess.run(
+            nextflow_cmd,
+            shell=True,
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        stdout = result.stdout.decode()
+        stderr = result.stderr.decode()
 
-        # Adjust to the correct output path of your Nextflow script
-        VCF_FILE_PATH = os.path.join(BASE_DIR, "results", "snp_analysis_results.vcf")
+        print("STDOUT:\n", stdout)
+        print("STDERR:\n", stderr)
 
-        if os.path.exists(VCF_FILE_PATH):
-            return "SNP analysis complete. Downloading VCF file...", True, dcc.send_file(VCF_FILE_PATH)
+        # Hardcoded path (adjust or make dynamic)
+        vcf_path = "/home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/work/f7/7a656e3cf92f3637ba7100dd046872/results/snp_analysis_results.vcf"
+
+        if os.path.exists(vcf_path):
+            return "SNP analysis complete. Downloading VCF file...", True, dcc.send_file(vcf_path)
         else:
-            return "SNP analysis failed. VCF file not found.", False, dash.no_update
+            return f"SNP analysis finished, but VCF file not found at expected location: {vcf_path}", False, dash.no_update
 
     except subprocess.CalledProcessError as e:
-        return f"Error running SNP analysis: {e.stderr.decode()}", False, dash.no_update
+        stderr_output = e.stderr.decode() if e.stderr else "No stderr captured"
+        stdout_output = e.stdout.decode() if e.stdout else "No stdout captured"
+        print("Exception STDOUT:\n", stdout_output)
+        print("Exception STDERR:\n", stderr_output)
+        return f"Error running SNP analysis:\n{stderr_output}", False, dash.no_update
+
     except Exception as e:
-        return f"An error occurred: {str(e)}", False, dash.no_update
+        return f"An unexpected error occurred: {str(e)}", False, dash.no_update
+
 
 
 # Set initial layout
