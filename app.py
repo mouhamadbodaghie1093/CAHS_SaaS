@@ -167,7 +167,7 @@ def run_snp_analysis(n_clicks):
         print("STDERR:\n", stderr)
 
         # Hardcoded path (adjust or make dynamic)
-        vcf_path = "/home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/work/f7/7a656e3cf92f3637ba7100dd046872/results/snp_analysis_results.vcf"
+        vcf_path = "snp_analysis_results.vcf"
 
         if os.path.exists(vcf_path):
             return "SNP analysis complete. Downloading VCF file...", True, dcc.send_file(vcf_path)
