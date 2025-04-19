@@ -8,6 +8,8 @@ import dash_daq as daq
 from dash import dcc, html
 from dash.dependencies import Input, Output, State
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SNP_SCRIPT_PATH = os.path.join(BASE_DIR, "snp_analysis.nf")
 # Initialize the Dash app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
 
@@ -147,26 +149,16 @@ def run_snp_analysis(n_clicks):
     if not os.path.exists(FNA_FILE_PATH) or not os.path.exists(BAM_FILE_PATH):
         return "Please upload both files before running analysis.", False, dash.no_update
 
-    # Run Nextflow
-    nextflow_cmd = f"nextflow run snp_analysis.nf --fna {FNA_FILE_PATH} --bam {BAM_FILE_PATH}"
+    nextflow_cmd = f"nextflow run {SNP_SCRIPT_PATH} --fna {FNA_FILE_PATH} --bam {BAM_FILE_PATH}"
 
     try:
-        # Run the Nextflow command and capture output
         result = subprocess.run(nextflow_cmd, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print("STDOUT:", result.stdout.decode())  # For debugging
-        print("STDERR:", result.stderr.decode())  # For debugging
+        print("STDOUT:", result.stdout.decode())
+        print("STDERR:", result.stderr.decode())
 
-        # Check the output directory from Nextflow's result
-        # Assuming the VCF file path from the Nextflow result is parsed
-        # Example output path: /home/user/.nextflow/work/f7/7a656e3cf92f3637ba7100dd046872/results/snp_analysis_results.vcf
-        # Update VCF_FILE_PATH dynamically if needed
+        # Adjust to the correct output path of your Nextflow script
+        VCF_FILE_PATH = os.path.join(BASE_DIR, "results", "snp_analysis_results.vcf")
 
-        # Parse or set the actual VCF file path here based on Nextflow execution.
-        # For simplicity, I'm using a fixed path here, but you might want to dynamically fetch it from the Nextflow log or metadata.
-
-        VCF_FILE_PATH = "/home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/work/f7/7a656e3cf92f3637ba7100dd046872/results/snp_analysis_results.vcf"
-
-        # Ensure VCF file exists
         if os.path.exists(VCF_FILE_PATH):
             return "SNP analysis complete. Downloading VCF file...", True, dcc.send_file(VCF_FILE_PATH)
         else:
