@@ -1,26 +1,22 @@
 import base64
 import os
 import subprocess
+import uuid
 
 import dash
 import dash_bootstrap_components as dbc
 import dash_daq as daq
-from dash import dcc, html
-from dash.dependencies import Input, Output, State
+from dash import dcc, html, Input, Output, State, ctx
+from dash.exceptions import PreventUpdate
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-SNP_SCRIPT_PATH = os.path.join(BASE_DIR, "snp_analysis.nf")
-# Initialize the Dash app
+# Constants
+UPLOAD_ROOT = "/tmp"
+
+# Dash App Initialization
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True)
+server = app.server
 
-# Define the paths for uploaded files
-UPLOAD_DIR = "/tmp"
-FNA_FILE_PATH = os.path.join(UPLOAD_DIR, "uploaded_file.fna")
-BAM_FILE_PATH = os.path.join(UPLOAD_DIR, "uploaded_file.bam")
-REFERENCE_FILE_PATH = "/path/to/your/reference/file.fasta"
-VCF_FILE_PATH = os.path.join(UPLOAD_DIR, "snp_analysis_results.vcf")
-
-# ---------------- LOGIN PAGE ---------------- #
+# Login Layout
 login_layout = dbc.Container([
     html.H2("CAHS_SaaS Login Page", className="text-center mt-5"),
     dbc.Row(
@@ -39,7 +35,30 @@ login_layout = dbc.Container([
     ),
 ], fluid=True)
 
-# ---------------- ANALYSIS SELECTION PAGE ---------------- #
+# SNP Analysis Layout
+snp_analysis_layout = html.Div([
+    dcc.Store(id='session-dir-store', storage_type='session'),
+
+    html.H2("SNP Analysis", style={'color': '#2C3E50', 'marginTop': '20px'}),
+
+    html.Label("Upload FNA File:", style={'fontWeight': 'bold'}),
+    dcc.Upload(id='upload-fna', children=html.Button('Upload FNA File'), multiple=False),
+    html.Div(id='fna-file-name', style={'marginTop': '10px', 'color': '#2E86C1'}),
+
+    html.Label("Upload BAM File:", style={'fontWeight': 'bold', 'marginTop': '20px'}),
+    dcc.Upload(id='upload-bam', children=html.Button('Upload BAM File'), multiple=False),
+    html.Div(id='bam-file-name', style={'marginTop': '10px', 'color': '#2E86C1'}),
+
+    html.Button('Run SNP Analysis', id='run-snp-analysis', n_clicks=0,
+                style={'backgroundColor': '#E74C3C', 'color': 'white', 'fontSize': '16px', 'padding': '10px'}),
+
+    daq.Indicator(id="status-indicator", value=False, color="green"),
+    html.Div(id='analysis-status', style={'marginTop': '10px', 'fontWeight': 'bold', 'color': '#27AE60'}),
+
+    dcc.Download(id="download-vcf"),
+])
+
+# Analysis Selection Layout
 analysis_selection_layout = html.Div([
     html.H2("Select Analysis Type", style={'color': '#2C3E50', 'marginTop': '20px'}),
     html.Div([
@@ -48,39 +67,19 @@ analysis_selection_layout = html.Div([
         html.Button('Bacteria Analysis', id='bacteria-analysis', n_clicks=0,
                     style={'backgroundColor': '#3498DB', 'color': 'white', 'padding': '10px', 'marginLeft': '20px'}),
     ], style={'textAlign': 'center', 'marginTop': '20px'}),
-    html.Div(id='analysis-page-container')  # Placeholder for the selected analysis page
+    html.Div(id='analysis-page-container')
 ])
 
-# ---------------- SNP ANALYSIS PAGE ---------------- #
-snp_analysis_layout = html.Div([
-    html.H2("SNP Analysis", style={'color': '#2C3E50', 'marginTop': '20px'}),
-
-    # Upload FNA file
-    html.Label("Upload FNA File:", style={'fontWeight': 'bold'}),
-    dcc.Upload(id='upload-fna', children=html.Button('Upload FNA File'), multiple=False),
-    html.Div(id='fna-file-name', style={'marginTop': '10px', 'color': '#2E86C1'}),
-
-    # Upload BAM file
-    html.Label("Upload BAM File:", style={'fontWeight': 'bold', 'marginTop': '20px'}),
-    dcc.Upload(id='upload-bam', children=html.Button('Upload BAM File'), multiple=False),
-    html.Div(id='bam-file-name', style={'marginTop': '10px', 'color': '#2E86C1'}),
-
-    # Run analysis button
-    html.Button('Run SNP Analysis', id='run-snp-analysis', n_clicks=0,
-                style={'backgroundColor': '#E74C3C', 'color': 'white', 'fontSize': '16px', 'padding': '10px'}),
-
-    # Status indicator
-    daq.Indicator(id="status-indicator", value=False, color="green"),
-    html.Div(id='analysis-status', style={'marginTop': '10px', 'fontWeight': 'bold', 'color': '#27AE60'}),
-
-    # Download result
-    dcc.Download(id="download-vcf"),
+# Main Layout
+app.layout = html.Div([
+    dcc.Location(id='url', refresh=False),
+    dcc.Store(id='session-dir-store', storage_type='session'),
+    html.Div(id='app-container', children=login_layout)
 ])
 
 
-# ---------------- CALLBACKS ---------------- #
+# -------------------------------- CALLBACKS -------------------------------- #
 
-# Handle login
 @app.callback(
     Output('app-container', 'children'),
     Input('login-button', 'n_clicks'),
@@ -89,109 +88,118 @@ snp_analysis_layout = html.Div([
     prevent_initial_call=True
 )
 def handle_login(n_clicks, username, password):
-    if username == 'admin' and password == 'password':  # Replace with actual authentication
+    # Simple hardcoded login check
+    if username == 'admin' and password == 'password':
         return analysis_selection_layout
-    else:
-        return login_layout
+    return login_layout
 
-
-# Display the correct page
 @app.callback(
     Output('analysis-page-container', 'children'),
-    [Input('snp-analysis', 'n_clicks'),
-     Input('bacteria-analysis', 'n_clicks')]
+    Input('snp-analysis', 'n_clicks'),
+    Input('bacteria-analysis', 'n_clicks'),
 )
-def display_analysis_page(snp_n_clicks, bacteria_n_clicks):
-    if snp_n_clicks > 0:
+def display_analysis_page(snp_clicks, bacteria_clicks):
+    triggered = ctx.triggered_id
+    if triggered == 'snp-analysis':
         return snp_analysis_layout
-    elif bacteria_n_clicks > 0:
+    elif triggered == 'bacteria-analysis':
         return html.P("Bacteria Analysis - Coming Soon!")
-    return dash.no_update
+    raise PreventUpdate
 
 
-# Handle file uploads
-def save_uploaded_file(contents, filename, file_path):
-    """ Decode base64-encoded file content and save it to disk. """
+@app.callback(
+    Output('session-dir-store', 'data'),
+    Input('analysis-page-container', 'children'),
+    prevent_initial_call=True
+)
+def init_session(_):
+    # Create a unique session directory for uploads and outputs
+    session_id = str(uuid.uuid4())
+    session_dir = os.path.join(UPLOAD_ROOT, session_id)
+    os.makedirs(session_dir, exist_ok=True)
+    return session_dir
+
+
+def save_file(contents, path):
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
-    with open(file_path, 'wb') as file:
-        file.write(decoded)
-    return filename
+    with open(path, 'wb') as f:
+        f.write(decoded)
 
 @app.callback(
     Output('fna-file-name', 'children'),
     Input('upload-fna', 'contents'),
     State('upload-fna', 'filename'),
+    State('session-dir-store', 'data'),
     prevent_initial_call=True
 )
-def upload_fna(contents, filename):
-    return f"Uploaded: {save_uploaded_file(contents, filename, FNA_FILE_PATH)}"
+def handle_fna_upload(contents, filename, session_dir):
+    if not contents:
+        raise PreventUpdate
+    path = os.path.join(session_dir, filename)
+    save_file(contents, path)
+    return f"Uploaded: {filename}"
 
 @app.callback(
     Output('bam-file-name', 'children'),
     Input('upload-bam', 'contents'),
     State('upload-bam', 'filename'),
+    State('session-dir-store', 'data'),
     prevent_initial_call=True
 )
-def upload_bam(contents, filename):
-    return f"Uploaded: {save_uploaded_file(contents, filename, BAM_FILE_PATH)}"
+def handle_bam_upload(contents, filename, session_dir):
+    if not contents:
+        raise PreventUpdate
+    path = os.path.join(session_dir, filename)
+    save_file(contents, path)
+    return f"Uploaded: {filename}"
 
-
-# Run SNP analysis
 @app.callback(
     [Output('analysis-status', 'children'),
      Output('status-indicator', 'value'),
      Output('download-vcf', 'data')],
     Input('run-snp-analysis', 'n_clicks'),
+    State('session-dir-store', 'data'),
     prevent_initial_call=True
 )
-def run_snp_analysis(n_clicks):
-    if not os.path.exists(FNA_FILE_PATH) or not os.path.exists(BAM_FILE_PATH):
-        return "Please upload both files before running analysis.", False, dash.no_update
+def run_snp_analysis(n_clicks, session_dir):
+    if not session_dir or not os.path.exists(session_dir):
+        return "Session directory not found.", False, dash.no_update
 
-    # Run Nextflow
-    nextflow_cmd = f"nextflow run snp_analysis.nf --fna {FNA_FILE_PATH} --bam {BAM_FILE_PATH}"
+    fna_files = [f for f in os.listdir(session_dir) if f.endswith('.fna')]
+    bam_files = [f for f in os.listdir(session_dir) if f.endswith('.bam')]
+
+    if not fna_files or not bam_files:
+        return "Missing FNA or BAM file.", False, dash.no_update
+
+    fna_path = os.path.join(session_dir, fna_files[0])
+    bam_path = os.path.join(session_dir, bam_files[0])
 
     try:
-        result = subprocess.run(
-            nextflow_cmd,
-            shell=True,
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+        nextflow_cmd = (
+            f"/usr/local/bin/nextflow run /home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/snp_analysis.nf "
+            f"--reference {fna_path} --bam {bam_path} --outdir {session_dir}"
         )
-        stdout = result.stdout.decode()
-        stderr = result.stderr.decode()
+        result = subprocess.run(
+            nextflow_cmd, shell=True, check=True,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
 
-        print("STDOUT:\n", stdout)
-        print("STDERR:\n", stderr)
+        print(result.stdout.decode())  # For debugging
+        print(result.stderr.decode())
 
-        # Hardcoded path (adjust or make dynamic)
-        vcf_path = "snp_analysis_results.vcf"
-
-        if os.path.exists(vcf_path):
-            return "SNP analysis complete. Downloading VCF file...", True, dcc.send_file(vcf_path)
+        vcf_files = [f for f in os.listdir(session_dir) if f.endswith(".vcf")]
+        if vcf_files:
+            vcf_path = os.path.join(session_dir, vcf_files[0])
+            return "SNP analysis complete. Click to download.", True, dcc.send_file(vcf_path)
         else:
-            return f"SNP analysis finished, but VCF file not found at expected location: {vcf_path}", False, dash.no_update
-
+            return "VCF output not found.", False, dash.no_update
     except subprocess.CalledProcessError as e:
-        stderr_output = e.stderr.decode() if e.stderr else "No stderr captured"
-        stdout_output = e.stdout.decode() if e.stdout else "No stdout captured"
-        print("Exception STDOUT:\n", stdout_output)
-        print("Exception STDERR:\n", stderr_output)
-        return f"Error running SNP analysis:\n{stderr_output}", False, dash.no_update
-
-    except Exception as e:
-        return f"An unexpected error occurred: {str(e)}", False, dash.no_update
+        error_output = e.stderr.decode() if e.stderr else str(e)
+        return f"Nextflow error:\n{error_output}", False, dash.no_update
 
 
+# -------------------------------- MAIN -------------------------------- #
 
-# Set initial layout
-app.layout = html.Div([
-    dcc.Location(id='url', refresh=False),
-    html.Div(id='app-container', children=login_layout)
-])
-
-# Run the app
 if __name__ == '__main__':
     app.run_server(debug=True, host='0.0.0.0', port=8060)

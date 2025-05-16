@@ -1,44 +1,79 @@
 nextflow.enable.dsl=2
 
-params.fna = '/home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/uploaded_fna.fna'
-params.bam = '/home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/uploaded_bam.bam'
-params.reference = '/home/mouhamadbodaghie/PycharmProjects/CAHS_SaaS/test/ref.fna'
+params.bam = null
+params.reference = null
+params.outdir = './results'
 
 process snp_calling {
+
     input:
-    path fna
     path bam
     path reference
 
     output:
-    path 'results/snp_analysis_results.vcf'
+    path "snp_analysis_results.vcf"
+    path "log.txt"
 
     script:
     """
-    # Create the results directory if it doesn't exist
-    mkdir -p ./results
-
-    # Ensure the reference genome is indexed
-    if [ ! -f ${reference}.fai ]; then
+    echo "Checking reference index..."
+    if [ ! -f "${reference}.fai" ]; then
+        echo "Indexing reference..."
         samtools faidx ${reference}
+    else
+        echo "Reference already indexed."
     fi
 
-    # Perform variant calling using bcftools
-    bcftools mpileup -f ${reference} ${bam} | bcftools call -mv -Ov -o ./results/snp_analysis_results.vcf
+    echo "Running bcftools mpileup and call..."
+    bcftools mpileup -f ${reference} ${bam} | bcftools call -mv -Ov -o snp_analysis_results.vcf
+
+    echo "Process complete." > log.txt
     """
 }
 
 workflow {
-    // Create separate channels for each input parameter
-    fna_ch = Channel.fromPath(params.fna)
+
+    // Validate input parameters
+    if (!params.bam) {
+        error "Missing required parameter: --bam"
+    }
+    if (!params.reference) {
+        error "Missing required parameter: --reference"
+    }
+
+    // Check if input files exist before starting
+    if (!file(params.bam).exists()) {
+        error "BAM file does not exist: ${params.bam}"
+    }
+    if (!file(params.reference).exists()) {
+        error "Reference FASTA file does not exist: ${params.reference}"
+    }
+
+    // Create output directory if not exists
+    def outDir = file(params.outdir)
+    if (!outDir.exists()) {
+        outDir.mkdirs()
+    }
+
+    // Create channels from input paths
     bam_ch = Channel.fromPath(params.bam)
     reference_ch = Channel.fromPath(params.reference)
 
-    // Pass the channels as inputs to the snp_calling process
-    snp_calling(fna_ch, bam_ch, reference_ch)
+    // Run the process and capture outputs
+    def results = snp_calling(bam_ch, reference_ch)
 
-    // Collect the output of the snp_calling process
-    snp_calling.out.subscribe { file ->
-        println "VCF Output: $file"
+    // Move outputs to outdir after completion
+    results.snp_analysis_results_vcf.view()  // for debugging (optional)
+    results.log_txt.view()                   // for debugging (optional)
+
+    results.snp_analysis_results_vcf.into { vcf_files }
+    results.log_txt.into { log_files }
+
+    vcf_files.subscribe { file ->
+        file.moveTo(outDir.resolve(file.name))
+    }
+
+    log_files.subscribe { file ->
+        file.moveTo(outDir.resolve(file.name))
     }
 }
